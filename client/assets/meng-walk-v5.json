@@ -1,0 +1,96 @@
+{
+  "file": "meng-walk-v5.png",
+  "width": 1254,
+  "height": 1254,
+  "columns": 2,
+  "rows": 2,
+  "cellSize": 627.0,
+  "displaySize": 73.382664,
+  "note": "Four repaired frames keep the bucket in the same near hand. Head/foot anchors and uniform scale preserve her standing height.",
+  "frames": [
+    {
+      "frame": 0,
+      "person": "meng",
+      "phase": 0,
+      "rect": [
+        0,
+        0,
+        627,
+        627
+      ],
+      "bounds": [
+        183,
+        21,
+        584,
+        617
+      ],
+      "origin": [
+        0.61457,
+        0.984051
+      ]
+    },
+    {
+      "frame": 1,
+      "person": "meng",
+      "phase": 1,
+      "rect": [
+        627,
+        0,
+        627,
+        627
+      ],
+      "bounds": [
+        116,
+        22,
+        460,
+        617
+      ],
+      "origin": [
+        0.455226,
+        0.984051
+      ]
+    },
+    {
+      "frame": 2,
+      "person": "meng",
+      "phase": 2,
+      "rect": [
+        0,
+        627,
+        627,
+        627
+      ],
+      "bounds": [
+        171,
+        7,
+        595,
+        591
+      ],
+      "origin": [
+        0.595492,
+        0.942584
+      ]
+    },
+    {
+      "frame": 3,
+      "person": "meng",
+      "phase": 3,
+      "rect": [
+        627,
+        627,
+        627,
+        627
+      ],
+      "bounds": [
+        108,
+        7,
+        488,
+        597
+      ],
+      "origin": [
+        0.452612,
+        0.952153
+      ]
+    }
+  ]
+}

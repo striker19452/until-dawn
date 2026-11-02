@@ -1,0 +1,25 @@
+import {test,expect} from '@playwright/test';
+import {initialCampaign,applyCampaignAction as act,settleNight} from '../src/campaign.js';
+import {createBattle,stepBattle,battleCommand} from '../src/battle.js';
+import {validateClientResult} from '../src/client-result.js';
+import {ENEMIES} from '../src/content.js';
+import {openTab} from './support/ui.js';
+const diag=page=>page.locator('canvas').evaluate(c=>c.getYardDiagnostics());
+for(const width of [320,390,1280])test(`breach at ${width}px destroys attachments visually, saves the loss and allows paid rebuilding`,async({page})=>{
+ await page.setViewportSize({width,height:width===320?568:844});const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ let state=act(initialCampaign(53),{type:'chooseRole',role:'repairman'}),revision=1;state.day=24;state.resources.materials=100;state.people[0].nightRole='sleep';state.flags.seenTypes=['walker'];for(const z of state.zones.filter(z=>['gate','left'].includes(z.id)))Object.assign(z,{hp:65,spikes:true,mesh:true,bell:true,traps:3});state=act(state,{type:'prepare'});
+ const b=createBattle(state,'breach-ui',{autoPause:false});b.schedule=[{at:9999,type:'walker',zone:'gate'}];b.challenge=null;b.zones[0].hp=1;let result=null;
+ const publish=()=>page.evaluate(data=>window.__lossWorker.dispatchEvent(new MessageEvent('message',{data})),{type:'state',battle:b,result,steps:1});
+ await page.exposeFunction('__lossCommand',async message=>{if(message.type==='dispose')return;if(message.type==='command')battleCommand(b,message.action);await publish();});
+ await page.addInitScript(()=>{const RealWorker=window.Worker;window.Worker=class extends EventTarget{constructor(url,options){super();if(!String(url).includes('night-worker'))return new RealWorker(url,options);window.__lossWorker=this;queueMicrotask(()=>this.dispatchEvent(new MessageEvent('message',{data:{type:'ready'}})));}postMessage(m){window.__lossCommand(m);}terminate(){}};});
+ await page.route('**/api/campaign',route=>route.fulfill({json:{state,runId:'loss-ui',revision}}));
+ await page.route('**/api/campaign/night-result',route=>{state=validateClientResult(state,route.request().postDataJSON().result);return route.fulfill({json:{state,runId:'loss-ui',revision:++revision}});});
+ await page.route('**/api/campaign/action',route=>{state=act(state,route.request().postDataJSON().action);return route.fulfill({json:{state,runId:'loss-ui',revision:++revision}});});
+ await page.goto('/');await expect(page.locator('#world')).toHaveAttribute('data-ready','true');await page.locator('[data-action=start-night]').click();
+ await expect.poll(async()=>(await diag(page)).components.filter(c=>c.zone==='gate'&&['spikes','mesh','bell','trap'].includes(c.kind)).length).toBe(6);await page.screenshot({path:`.local/creature-health/before-${width}.png`,fullPage:true});
+ b.enemies=[{id:'walker',type:'walker',zone:'gate',x:240,y:475,hp:ENEMIES.walker.hp,max:ENEMIES.walker.hp,mode:'attack',attack:3.1,progress:0,stun:0,called:false}];b.fires[0].heat=0;b.paused=false;stepBattle(b);b.paused=true;await publish();
+ await expect.poll(async()=>(await diag(page)).components.find(c=>c.id==='gate').state).toBe('destroyed');let d=await diag(page);expect(d.components.filter(c=>c.zone==='gate'&&['spikes','mesh','bell','trap'].includes(c.kind))).toHaveLength(0);expect(d.components.filter(c=>c.zone==='left'&&['spikes','mesh','bell','trap'].includes(c.kind))).toHaveLength(6);expect(d.components.some(c=>c.id==='fire-central')).toBe(true);expect(d.feedback.effects.some(e=>e.type==='breach'&&e.text.includes('一同损毁'))).toBe(true);
+ await page.screenshot({path:`.local/creature-health/after-${width}.png`,fullPage:true});
+ b.finished=true;result=settleNight(state,b);await publish();await expect(page.locator('#phase')).toHaveText('天亮战报');await expect(page.getByTestId('defense-losses')).toContainText('正门 · 翻刺、埋网、铃绳、陷阱×3');await page.locator('[data-action=close-overlay]').click();await page.locator('[data-action=next]').click();
+ await openTab(page,'defense');await expect(page.locator('[data-action=defense][data-feature=spikes]')).toBeDisabled();await expect(page.locator('[data-action=craft][data-item=trap]')).toBeDisabled();await page.locator('[data-action=repair][data-zone=gate]').click();await expect.poll(()=>state.zones[0].hp).toBeGreaterThan(0);const before=state.resources.materials;await page.locator('[data-action=defense][data-feature=spikes]').click();await expect.poll(()=>state.zones[0].spikes).toBe(true);expect(state.resources.materials).toBe(before-10);expect(state.zones[0].mesh).toBe(false);expect(state.zones[0].traps).toBe(0);expect(errors).toEqual([]);
+});

@@ -1,0 +1,97 @@
+{
+  "file": "skitter-walk-v1.png",
+  "generatedWith": "built-in image_gen.imagegen",
+  "width": 2172,
+  "height": 724,
+  "columns": 4,
+  "rows": 1,
+  "cellSize": 543.0,
+  "displaySize": 56,
+  "baseFacing": -1,
+  "frames": [
+    {
+      "frame": 0,
+      "species": "skitter",
+      "phase": 0,
+      "rect": [
+        0,
+        0,
+        543,
+        724
+      ],
+      "bounds": [
+        33,
+        200,
+        512,
+        500
+      ],
+      "origin": [
+        0.501842,
+        0.690608
+      ]
+    },
+    {
+      "frame": 1,
+      "species": "skitter",
+      "phase": 1,
+      "rect": [
+        543,
+        0,
+        543,
+        724
+      ],
+      "bounds": [
+        15,
+        232,
+        527,
+        501
+      ],
+      "origin": [
+        0.499079,
+        0.691989
+      ]
+    },
+    {
+      "frame": 2,
+      "species": "skitter",
+      "phase": 2,
+      "rect": [
+        1086,
+        0,
+        543,
+        724
+      ],
+      "bounds": [
+        29,
+        202,
+        492,
+        512
+      ],
+      "origin": [
+        0.479742,
+        0.707182
+      ]
+    },
+    {
+      "frame": 3,
+      "species": "skitter",
+      "phase": 3,
+      "rect": [
+        1629,
+        0,
+        543,
+        724
+      ],
+      "bounds": [
+        2,
+        216,
+        510,
+        512
+      ],
+      "origin": [
+        0.471455,
+        0.707182
+      ]
+    }
+  ]
+}

@@ -1,0 +1,2 @@
+import { defineConfig } from '@playwright/test';
+export default defineConfig({testDir:'./browser-test',timeout:60000,use:{baseURL:process.env.TEST_URL||'http://127.0.0.1:4182',channel:'chrome',headless:true,viewport:{width:390,height:844},launchOptions:{args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']},screenshot:'only-on-failure',trace:'retain-on-failure'},reporter:'list',workers:1});

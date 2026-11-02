@@ -1,0 +1,6 @@
+{
+  "tool": "built-in image_gen.imagegen",
+  "reference": "client/assets/puppy-v1.png",
+  "transparent_background": true,
+  "prompt": "Create a corrected game walk cycle as a transparent 2-by-2 sprite sheet, based on the original golden puppy with green bandana. Four separate full-body images of the SAME puppy, same size, face, fur color, hand painted storybook style and 3/4 side view facing right. Each image occupies ONLY the center 70% of its equal-sized cell; leave AT LEAST 15% CLEAR TRANSPARENT PADDING between every puppy and each cell edge. Never let paws, tail, ears or any part cross a cell boundary. No objects, no lines, no text. Animate an easily readable natural walk with FOUR DIFFERENT hind leg positions: top left: near hind paw reaches forward under belly; top right: near hind paw lifts as it passes below hip; bottom left: near hind leg stretches back behind hip; bottom right: near hind paw plants vertically under hip, other hind paw lifts. Front paws also alternate, body and head remain almost identical in all four images. Each frame is fully isolated on a real transparent background."
+}

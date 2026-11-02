@@ -1,0 +1,35 @@
+import {test,expect} from '@playwright/test';
+import {mkdirSync,writeFileSync} from 'node:fs';
+import {initialCampaign,applyCampaignAction as act,makePerson} from '../src/campaign.js';
+import {createBattle,stepBattle,battleCommand} from '../src/battle.js';
+import {walkablePoint} from '../src/movement.js';
+const evidence='.local/combat-spacing';mkdirSync(evidence,{recursive:true});
+const diagnostics=page=>page.locator('canvas').evaluate(c=>c.getYardDiagnostics());
+const distance=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+function fixture(){let s=act(initialCampaign(53),{type:'chooseRole',role:'watchman'});s.flags.centralFire=false;s.people[0].zone='right';s=act(s,{type:'prepare'});const b=createBattle(s,'spacing-ui',{autoPause:false});b.schedule=[{at:9999,type:'walker',zone:'gate'}];b.challenge=null;b.paused=true;b.fires=[];Object.assign(b.people[0],{x:320,y:410,fear:0});b.enemies=[{id:'foe',type:'walker',zone:'right',x:380,y:410,hp:1000,max:1000,mode:'attack',attack:0,stun:99,progress:0}];return {s,b};}
+async function controlled(page,f){
+ const {s,b}=f,publish=()=>page.evaluate(b=>window.__spacingWorker.dispatchEvent(new MessageEvent('message',{data:{type:'state',battle:b,result:null,steps:0}})),b);
+ await page.exposeFunction('__spacingMessage',async m=>{if(m.type==='command')battleCommand(b,m.action);if(m.type!=='dispose')await publish();});
+ await page.addInitScript(()=>{const Native=window.Worker;window.Worker=class extends EventTarget{constructor(url,options){super();if(!String(url).includes('night-worker'))return new Native(url,options);window.__spacingWorker=this;queueMicrotask(()=>this.dispatchEvent(new MessageEvent('message',{data:{type:'ready'}})));}postMessage(m){window.__spacingMessage(m);}terminate(){}};});
+ await page.route('**/api/campaign',r=>r.fulfill({json:{state:s,runId:'spacing-ui',revision:1}}));await page.goto('/');await expect(page.locator('#world')).toHaveAttribute('data-ready','true');await page.locator('[data-action=start-night]').click();await expect.poll(()=>diagnostics(page).then(d=>d.tokens.some(t=>t.id==='e-foe'))).toBe(true);return publish;
+}
+
+for(const width of [320,1280])test(`fighting at ${width}px stops short, faces the enemy, has visible space and freezes when paused`,async({page})=>{
+ await page.setViewportSize({width,height:width===320?568:900});const errors=[];page.on('pageerror',e=>errors.push(e.message));const f=fixture(),publish=await controlled(page,f);f.b.paused=false;
+ for(let i=0;i<100;i++)stepBattle(f.b,.05);await publish();await expect.poll(async()=>{const d=await diagnostics(page),p=d.tokens.find(t=>t.id==='p-hero'),e=d.tokens.find(t=>t.id==='e-foe');return p&&!p.moving&&distance(p,e)>35;}).toBe(true);
+ let d=await diagnostics(page),p=d.tokens.find(t=>t.id==='p-hero'),e=d.tokens.find(t=>t.id==='e-foe');expect(distance(f.b.people[0],f.b.enemies[0])).toBeGreaterThanOrEqual(36);expect(distance(f.b.people[0],f.b.enemies[0])).toBeLessThanOrEqual(46);expect(f.b.events.some(e=>e.type==='attack')).toBe(true);expect(p.flipX).toBe(false);expect(e.bodyBounds.left-(p.bodyBounds.left+p.bodyBounds.width)).toBeGreaterThan(2);
+ await page.screenshot({path:`${evidence}/spacing-${width}.png`,fullPage:true});f.b.paused=true;await publish();await expect.poll(()=>diagnostics(page).then(d=>d.paused)).toBe(true);await page.waitForTimeout(100);const frozen=(await diagnostics(page)).tokens;await page.waitForTimeout(300);expect((await diagnostics(page)).tokens).toEqual(frozen);
+ // A closer target makes a real backwards step, while the painted face stays toward it.
+ f.b.paused=false;f.b.enemies[0].x=f.b.people[0].x+15;for(let i=0;i<8;i++)stepBattle(f.b,.05);await publish();await expect.poll(()=>diagnostics(page).then(d=>d.tokens.find(t=>t.id==='p-hero')?.moving)).toBe(true);d=await diagnostics(page);p=d.tokens.find(t=>t.id==='p-hero');expect(p.flipX).toBe(false);expect(errors).toEqual([]);
+});
+
+test('multiple defenders separate smoothly around a shared creature while keeping it in striking range',async({page})=>{
+ const f=fixture();for(const id of ['lin','chen']){const p=makePerson(id,id,'幸存者','guard');Object.assign(p,{x:380,y:410,zone:'right',cooldown:100});f.b.people.push(p);f.b.work[id]=0;}Object.assign(f.b.people[0],{x:380,y:410,cooldown:100});const publish=await controlled(page,f);f.b.paused=false;for(let i=0;i<180;i++)stepBattle(f.b,.05);await publish();await expect.poll(()=>diagnostics(page).then(d=>d.tokens.filter(t=>t.id.startsWith('p-')&&!t.moving).length)).toBe(3);
+ const d=await diagnostics(page);for(const p of f.b.people){expect(distance(p,f.b.enemies[0])).toBeGreaterThanOrEqual(36);expect(distance(p,f.b.enemies[0])).toBeLessThanOrEqual(46);expect(walkablePoint(p,f.b.walkMap)).toBe(true);}for(let i=0;i<f.b.people.length;i++)for(let j=i+1;j<f.b.people.length;j++)expect(distance(f.b.people[i],f.b.people[j])).toBeGreaterThanOrEqual(18);writeFileSync(`${evidence}/crowd-diagnostics.json`,JSON.stringify({battle:f.b,scene:d},null,2));await page.screenshot({path:`${evidence}/crowd-390.png`,fullPage:true});
+});
+
+test('real offline worker attacks from separated positions and preserves the 50 attack cap on the first and boss nights',async({page,context})=>{
+ test.setTimeout(60000);const api=[],errors=[];page.on('request',r=>{if(r.url().includes('/api/'))api.push(r.url());});page.on('pageerror',e=>errors.push(e.message));await page.addInitScript(()=>{const Native=window.Worker;window.__spacingHits=[];window.Worker=class extends Native{constructor(url,options){super(url,options);if(!String(url).includes('night-worker'))return;window.__spacingRealWorker=this;let last=0;this.addEventListener('message',({data})=>{if(data.type!=='state')return;for(const e of data.battle.events)if(e.id>last&&e.type==='attack')window.__spacingHits.push({distance:Math.hypot(e.x-e.source.x,e.y-e.source.y),time:e.time});last=data.battle.eventSeq;});}};});
+ for(const day of [1,7]){await context.setOffline(false);await page.goto(`/?test=${day}&testPreset=crew`);await expect(page.locator('#world')).toHaveAttribute('data-ready','true');await expect.poll(()=>page.locator('#world').evaluate(el=>el.getNightSnapshot()?.paused)).toBe(true);await context.setOffline(true);await page.evaluate(()=>{for(const action of [{type:'autoPause',enabled:false},{type:'speed',value:2},{type:'resume'}])window.__spacingRealWorker.postMessage({type:'command',action});});await expect.poll(()=>page.evaluate(()=>window.__spacingHits.filter(h=>h.distance>=34&&h.distance<=50).length),{timeout:25000}).toBeGreaterThanOrEqual(3);await page.evaluate(()=>window.__spacingRealWorker.postMessage({type:'command',action:{type:'pause'}}));await expect.poll(()=>page.locator('#world').evaluate(el=>el.getNightSnapshot()?.paused)).toBe(true);const hits=await page.evaluate(()=>window.__spacingHits);expect(hits.every(h=>h.distance<=50)).toBe(true);writeFileSync(`${evidence}/worker-day-${day}.json`,JSON.stringify(hits,null,2));await page.screenshot({path:`${evidence}/worker-day-${day}.png`,fullPage:true});}
+ expect(api).toEqual([]);expect(errors).toEqual([]);
+});

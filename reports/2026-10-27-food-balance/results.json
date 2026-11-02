@@ -1,0 +1,472 @@
+{
+  "date": "2026-10-27",
+  "consumption": [
+    {
+      "people": 1,
+      "stove": null,
+      "food": 3,
+      "workExtra": 1,
+      "nightExtra": 1
+    },
+    {
+      "people": 1,
+      "stove": "normal",
+      "food": 2,
+      "workExtra": 1,
+      "nightExtra": 1
+    },
+    {
+      "people": 1,
+      "stove": "yield",
+      "food": 1,
+      "workExtra": 1,
+      "nightExtra": 1
+    },
+    {
+      "people": 1,
+      "stove": "steady",
+      "food": 2,
+      "workExtra": 1,
+      "nightExtra": 1
+    },
+    {
+      "people": 2,
+      "stove": null,
+      "food": 6,
+      "workExtra": 2,
+      "nightExtra": 2
+    },
+    {
+      "people": 2,
+      "stove": "normal",
+      "food": 5,
+      "workExtra": 2,
+      "nightExtra": 2
+    },
+    {
+      "people": 2,
+      "stove": "yield",
+      "food": 4,
+      "workExtra": 2,
+      "nightExtra": 2
+    },
+    {
+      "people": 2,
+      "stove": "steady",
+      "food": 5,
+      "workExtra": 2,
+      "nightExtra": 2
+    },
+    {
+      "people": 3,
+      "stove": null,
+      "food": 9,
+      "workExtra": 3,
+      "nightExtra": 3
+    },
+    {
+      "people": 3,
+      "stove": "normal",
+      "food": 8,
+      "workExtra": 3,
+      "nightExtra": 3
+    },
+    {
+      "people": 3,
+      "stove": "yield",
+      "food": 7,
+      "workExtra": 3,
+      "nightExtra": 3
+    },
+    {
+      "people": 3,
+      "stove": "steady",
+      "food": 8,
+      "workExtra": 3,
+      "nightExtra": 3
+    },
+    {
+      "people": 4,
+      "stove": null,
+      "food": 12,
+      "workExtra": 4,
+      "nightExtra": 4
+    },
+    {
+      "people": 4,
+      "stove": "normal",
+      "food": 11,
+      "workExtra": 4,
+      "nightExtra": 4
+    },
+    {
+      "people": 4,
+      "stove": "yield",
+      "food": 10,
+      "workExtra": 4,
+      "nightExtra": 4
+    },
+    {
+      "people": 4,
+      "stove": "steady",
+      "food": 11,
+      "workExtra": 4,
+      "nightExtra": 4
+    },
+    {
+      "people": 5,
+      "stove": null,
+      "food": 15,
+      "workExtra": 5,
+      "nightExtra": 5
+    },
+    {
+      "people": 5,
+      "stove": "normal",
+      "food": 14,
+      "workExtra": 5,
+      "nightExtra": 5
+    },
+    {
+      "people": 5,
+      "stove": "yield",
+      "food": 13,
+      "workExtra": 5,
+      "nightExtra": 5
+    },
+    {
+      "people": 5,
+      "stove": "steady",
+      "food": 14,
+      "workExtra": 5,
+      "nightExtra": 5
+    }
+  ],
+  "gardens": [
+    {
+      "branch": "normal",
+      "perWeather": {
+        "clear": 3,
+        "rain": 4,
+        "hot": 2
+      },
+      "averageClearPerDay": 1.5,
+      "cycles": [
+        {
+          "seed": 11,
+          "total28": 43
+        },
+        {
+          "seed": 53,
+          "total28": 44
+        },
+        {
+          "seed": 97,
+          "total28": 44
+        }
+      ]
+    },
+    {
+      "branch": "yield",
+      "perWeather": {
+        "clear": 5,
+        "rain": 6,
+        "hot": 4
+      },
+      "averageClearPerDay": 2.5,
+      "cycles": [
+        {
+          "seed": 11,
+          "total28": 71
+        },
+        {
+          "seed": 53,
+          "total28": 72
+        },
+        {
+          "seed": 97,
+          "total28": 72
+        }
+      ]
+    },
+    {
+      "branch": "steady",
+      "perWeather": {
+        "clear": 5,
+        "rain": 5,
+        "hot": 5
+      },
+      "averageClearPerDay": 2.5,
+      "cycles": [
+        {
+          "seed": 11,
+          "total28": 70
+        },
+        {
+          "seed": 53,
+          "total28": 70
+        },
+        {
+          "seed": 97,
+          "total28": 70
+        }
+      ]
+    }
+  ],
+  "searches": [
+    {
+      "site": "alley",
+      "deep": false,
+      "escortSkill": null,
+      "ap": 2,
+      "food": 4,
+      "loot": {
+        "food": 4,
+        "water": 3,
+        "materials": 2
+      }
+    },
+    {
+      "site": "alley",
+      "deep": false,
+      "escortSkill": 0,
+      "ap": 2,
+      "food": 6,
+      "loot": {
+        "food": 6,
+        "water": 4,
+        "materials": 3
+      }
+    },
+    {
+      "site": "alley",
+      "deep": false,
+      "escortSkill": 2,
+      "ap": 2,
+      "food": 7,
+      "loot": {
+        "food": 7,
+        "water": 4,
+        "materials": 3
+      }
+    },
+    {
+      "site": "alley",
+      "deep": true,
+      "escortSkill": null,
+      "ap": 3,
+      "food": 8,
+      "loot": {
+        "food": 8,
+        "water": 4,
+        "materials": 3
+      }
+    },
+    {
+      "site": "alley",
+      "deep": true,
+      "escortSkill": 0,
+      "ap": 3,
+      "food": 10,
+      "loot": {
+        "food": 10,
+        "water": 5,
+        "materials": 4
+      }
+    },
+    {
+      "site": "alley",
+      "deep": true,
+      "escortSkill": 2,
+      "ap": 3,
+      "food": 11,
+      "loot": {
+        "food": 11,
+        "water": 5,
+        "materials": 4
+      }
+    },
+    {
+      "site": "greenhouse",
+      "deep": false,
+      "escortSkill": null,
+      "ap": 2,
+      "food": 6,
+      "loot": {
+        "food": 6,
+        "fuel": 2
+      }
+    },
+    {
+      "site": "greenhouse",
+      "deep": false,
+      "escortSkill": 0,
+      "ap": 2,
+      "food": 8,
+      "loot": {
+        "food": 8,
+        "fuel": 3
+      }
+    },
+    {
+      "site": "greenhouse",
+      "deep": false,
+      "escortSkill": 2,
+      "ap": 2,
+      "food": 9,
+      "loot": {
+        "food": 9,
+        "fuel": 3
+      }
+    },
+    {
+      "site": "greenhouse",
+      "deep": true,
+      "escortSkill": null,
+      "ap": 3,
+      "food": 12,
+      "loot": {
+        "food": 12,
+        "fuel": 3
+      }
+    },
+    {
+      "site": "greenhouse",
+      "deep": true,
+      "escortSkill": 0,
+      "ap": 3,
+      "food": 14,
+      "loot": {
+        "food": 14,
+        "fuel": 4
+      }
+    },
+    {
+      "site": "greenhouse",
+      "deep": true,
+      "escortSkill": 2,
+      "ap": 3,
+      "food": 15,
+      "loot": {
+        "food": 15,
+        "fuel": 4
+      }
+    },
+    {
+      "site": "market",
+      "deep": false,
+      "escortSkill": null,
+      "ap": 2,
+      "food": 4,
+      "loot": {
+        "food": 4,
+        "water": 3,
+        "fuel": 2
+      }
+    },
+    {
+      "site": "market",
+      "deep": false,
+      "escortSkill": 0,
+      "ap": 2,
+      "food": 6,
+      "loot": {
+        "food": 6,
+        "water": 4,
+        "fuel": 3
+      }
+    },
+    {
+      "site": "market",
+      "deep": false,
+      "escortSkill": 2,
+      "ap": 2,
+      "food": 7,
+      "loot": {
+        "food": 7,
+        "water": 4,
+        "fuel": 3
+      }
+    },
+    {
+      "site": "market",
+      "deep": true,
+      "escortSkill": null,
+      "ap": 3,
+      "food": 8,
+      "loot": {
+        "food": 8,
+        "water": 4,
+        "fuel": 3
+      }
+    },
+    {
+      "site": "market",
+      "deep": true,
+      "escortSkill": 0,
+      "ap": 3,
+      "food": 10,
+      "loot": {
+        "food": 10,
+        "water": 5,
+        "fuel": 4
+      }
+    },
+    {
+      "site": "market",
+      "deep": true,
+      "escortSkill": 2,
+      "ap": 3,
+      "food": 11,
+      "loot": {
+        "food": 11,
+        "water": 5,
+        "fuel": 4
+      }
+    }
+  ],
+  "jobs": [
+    {
+      "job": "rest",
+      "grossGain": 0,
+      "foodNeed": 3,
+      "net": -3
+    },
+    {
+      "job": "cook",
+      "grossGain": 0,
+      "foodNeed": 3,
+      "net": -3
+    },
+    {
+      "job": "farm",
+      "grossGain": 2,
+      "foodNeed": 4,
+      "net": -2
+    },
+    {
+      "job": "farm",
+      "skill": 0,
+      "gross": 1,
+      "netOverRest": 0
+    },
+    {
+      "job": "farm",
+      "skill": 1,
+      "gross": 1,
+      "netOverRest": 0
+    },
+    {
+      "job": "farm",
+      "skill": 2,
+      "gross": 2,
+      "netOverRest": 1
+    },
+    {
+      "job": "farm",
+      "skill": 3,
+      "gross": 3,
+      "netOverRest": 2
+    }
+  ]
+}

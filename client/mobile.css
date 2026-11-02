@@ -1,0 +1,99 @@
+/* Keep desktop controls in place; phones use a compact HUD and a command dock. */
+.mobile-only{display:none!important}
+.defense-zone-picker{display:block;font-size:11px;color:var(--muted);margin-bottom:12px}
+
+@media(max-width:959px){
+ .mobile-only{display:revert!important}
+ .desktop-only,.mobile-only[hidden]{display:none!important}
+ .shell,.shell.wide-view{display:grid;max-width:560px;grid-template-columns:minmax(0,1fr);grid-template-rows:44px 32px auto auto minmax(0,1fr) auto auto auto;grid-template-areas:"status" "stock" "boss" "notice" "scene" "controls" "advance" "nav";gap:0}
+ .shell>.top{display:none}
+ .shell>.status{grid-area:status;height:44px;min-height:44px;padding:0 6px;border:0}
+ .status>#save,.status #audio-toggle,.status #reload,.status #view-toggle{display:none}
+ .status>#mobile-context{flex:1;margin-right:72px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px;font-weight:600;color:var(--ink)}
+ .status>div{height:44px;gap:4px;align-items:center}
+ .status .mobile-menu,.status #mobile-pause{height:40px;min-height:40px;padding:4px 6px;border:1px solid var(--line);border-radius:6px;color:var(--ink);font-size:11px}
+ .status .mobile-menu{width:64px}
+ .status #mobile-pause{width:50px;background:#c5a97225;border-color:#9c8a60}
+ .shell>.stock-summary{grid-area:stock}
+ .shell .resources{height:32px;min-height:32px;margin:0;padding:0 5px;border-bottom:1px solid var(--line)}
+ .resource{display:flex;align-items:center;justify-content:center;gap:3px}
+ .resource>div{display:inline-flex;align-items:center}
+ .resource span{font-size:9px}
+ .resource b{font-size:16px;padding:0}
+ .shell .exposure-status{position:absolute;top:env(safe-area-inset-top);right:72px;z-index:6;width:70px;height:44px;min-height:44px;margin:0;padding:0 3px;justify-content:center;border:0;font-size:10px}
+ .shell.night .exposure-status{right:126px}
+ .shell .exposure-status>span:nth-child(2){display:none}
+ .shell .exposure-status[hidden]{display:none}
+ .shell #nightbar,.shell.boss-night #nightbar{grid-area:boss;display:block;margin:0;padding:0}
+ .shell #nightbar>.nightbar{display:none}
+ .shell .boss-summary{width:calc(100% - 12px);min-height:44px;margin:3px 6px;padding:4px 7px 7px}
+ .shell .boss-summary b{font-size:12px}
+ .shell .boss-summary small{font-size:10px}
+ .shell>.world-wrap,.shell.boss-night>.world-wrap{grid-area:scene;margin:0;min-height:0;border-radius:0;box-shadow:none}
+ .shell .world{height:100%;min-height:0}
+ .shell .world::before{content:"";position:absolute;inset:-12px;background:url('./assets/yard-ground-day-v5.webp') center/cover;filter:blur(10px);opacity:.7;pointer-events:none}
+ .shell.night .world::before{background-image:url('./assets/yard-ground-night-v5.webp')}
+ .shell .yard-art{mask-image:linear-gradient(transparent,#000 16px,#000 calc(100% - 16px),transparent)}
+ .shell .scene-radio{display:none}
+ .shell .world-label,.shell .scene-time{top:6px;font-size:10px;padding:4px 6px}
+ .shell.night .scene-time{display:none}
+ .shell .world-caption{left:6px;right:6px;bottom:6px;font-size:11px}
+ .shell.night .world-caption{padding:4px 6px;font-size:10px}
+ .shell.night #caption strong,.shell.night #caption #map-help{display:none}
+ .shell.night #caption[data-moving=true] #map-help{display:block}
+ .shell #notice{grid-area:notice;margin:0}
+ .shell:not(.night) #notice,.shell #notice[data-routine=true]{display:none}
+ .shell:not(.night)[data-phase=ready] #notice:not(:empty){display:block}
+ .shell #notice .notice,.shell.boss-night #notice .notice{margin:0;padding:4px 8px;max-height:56px;overflow-y:auto;font-size:11px;line-height:1.5;border-radius:0}
+ .shell>.zone-list{display:none}
+ .shell:not(.night)>#panel{display:none}
+ .shell.night>#panel{grid-area:controls;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;margin:0;padding:5px 6px;border-width:1px 0 0;border-radius:0}
+ .shell.night #panel>.order-status{display:none}
+ .shell.night .battle-selects{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) 80px minmax(0,1fr);gap:4px;margin:0}
+ .shell.night .battle-selects>label{min-width:0}
+ .shell.night .battle-selects select{height:44px;min-height:44px;margin:0;padding:4px 5px;font-size:11px}
+ .shell.night .central-fire-status{height:44px;min-height:44px;gap:4px;padding:3px 5px}
+ .shell #central-fire-effect{display:none}
+ .shell .central-fire-status #compact-fire-effect{font-size:10px}
+ .shell .central-fire-status small{font-size:9px}
+ .shell.night .battle-orders{grid-column:1/span 4;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+ .shell.night .battle-orders .button{min-width:0;min-height:44px;padding:4px 2px;font-size:12px}
+ .shell.night .battle-orders small{font-size:9px}
+ .shell.night .battle-foot{display:contents}
+ .shell.night #battle-live{display:none}
+ .shell.night .battle-foot>.button{grid-column:5;grid-row:2;min-height:44px;padding:4px 2px;font-size:10px}
+ .shell.night #panel>button{grid-column:1/-1}
+ .shell>.big-action{grid-area:advance;margin:0;padding:4px 8px}
+ .shell>.big-action:empty{display:none}
+ .shell>.big-action>.button{min-height:44px}
+ .shell>.nav,.shell.wide-view>.nav{grid-area:nav;height:calc(44px + env(safe-area-inset-bottom));min-height:calc(44px + env(safe-area-inset-bottom));padding:0 5px env(safe-area-inset-bottom);gap:2px}
+ .shell .nav>button,.shell .nav>.mobile-only{display:flex!important;align-items:center;justify-content:center;gap:3px;min-height:44px;padding:3px 2px;border:0;border-radius:0;background:none;font-size:11px;color:var(--muted)}
+ .shell .nav>.desktop-only{display:none!important}
+ .shell .nav>button[data-panel=manage]{order:1}
+ .shell .nav>button[data-panel=build]{order:2}
+ .shell .nav>button[data-tab=explore]{order:3}
+ .shell .nav>button[data-tab=members]{order:4}
+ .shell .nav>button[data-tab=journal]{order:5}
+ .shell.night>.nav{display:none}
+ .sheet,.sheet.night{bottom:0;width:min(calc(100% - 8px),552px);max-height:calc(100dvh - 62px - env(safe-area-inset-top));padding-bottom:env(safe-area-inset-bottom);border-radius:14px 14px 0 0}
+ .sheet-head{padding:6px 12px}
+ .sheet-head>div>small{display:none}
+ .sheet-head h2{font-size:17px}
+ .sheet-close{width:auto;min-width:66px;min-height:44px;padding:3px 7px;font-size:11px}
+ .sheet-body{padding:12px}
+ .menu-links{margin:14px 0}
+ .menu-links .button{min-height:48px}
+ .error{bottom:calc(105px + env(safe-area-inset-bottom))}
+}
+
+/* A rotated phone gets a sidebar rather than a short strip of courtyard. */
+@media(min-width:600px) and (max-width:959px) and (max-height:500px){
+ .shell,.shell.wide-view{max-width:none;grid-template-columns:minmax(0,1fr) 272px;grid-template-areas:"scene status" "scene stock" "scene boss" "scene notice" "scene ." "scene controls" "scene advance" "scene nav"}
+ .shell .status>#mobile-context{margin-right:0}
+ .shell>.stock-summary{display:grid;grid-template-columns:minmax(0,1fr) 56px}
+ .shell .resources{padding:0 2px}
+ .shell .resource{gap:1px}
+ .shell .resource span{font-size:8px}
+ .shell .resource b{font-size:14px}
+ .shell .exposure-status,.shell.night .exposure-status{position:static;width:auto;height:32px;min-height:32px;padding:0;font-size:9px}
+}

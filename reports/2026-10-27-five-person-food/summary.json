@@ -1,0 +1,109 @@
+{
+  "date": "2026-10-27",
+  "runs": 24,
+  "nights": 570,
+  "errors": 0,
+  "groups": [
+    {
+      "mode": "baseline",
+      "label": "原补粮策略",
+      "runs": 9,
+      "wins": 0,
+      "lastDays": [
+        14,
+        17,
+        14,
+        17,
+        17,
+        14,
+        18,
+        19,
+        20
+      ],
+      "hungryNights": 100,
+      "thirstyNights": 0,
+      "finalFood": [
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0
+      ],
+      "averageFoodSearchAP": 24.7
+    },
+    {
+      "mode": "demand",
+      "label": "原分工＋按口粮补给",
+      "runs": 3,
+      "wins": 3,
+      "lastDays": [
+        28,
+        28,
+        28
+      ],
+      "hungryNights": 0,
+      "thirstyNights": 0,
+      "finalFood": [
+        4,
+        4,
+        4
+      ],
+      "averageFoodSearchAP": 15.7
+    },
+    {
+      "mode": "food",
+      "label": "双种植＋护理＋交易补粮",
+      "runs": 9,
+      "wins": 9,
+      "lastDays": [
+        28,
+        28,
+        28,
+        28,
+        28,
+        28,
+        28,
+        28,
+        28
+      ],
+      "hungryNights": 0,
+      "thirstyNights": 0,
+      "finalFood": [
+        4,
+        4,
+        4,
+        3,
+        4,
+        2,
+        2,
+        3,
+        2
+      ],
+      "averageFoodSearchAP": 9.8
+    },
+    {
+      "mode": "search",
+      "label": "双种植＋护理＋不换食物",
+      "runs": 3,
+      "wins": 3,
+      "lastDays": [
+        28,
+        28,
+        28
+      ],
+      "hungryNights": 0,
+      "thirstyNights": 0,
+      "finalFood": [
+        3,
+        4,
+        4
+      ],
+      "averageFoodSearchAP": 48
+    }
+  ],
+  "sourceChanges": []
+}

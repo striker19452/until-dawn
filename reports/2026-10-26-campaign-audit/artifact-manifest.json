@@ -1,0 +1,21 @@
+{
+  "node": "v22.20.0",
+  "platform": "darwin",
+  "arch": "arm64",
+  "date": "2026-10-26",
+  "engineSnapshot": ".local/campaign-state-audit-20261026",
+  "files": {
+    "audit-results.json": "f26268b4619a83edad44f118ba87da473f45dedb1a3da50ee6cc6b9da4a13122",
+    "build-report.py": "89df00ccb33010c6fc0af8ad4b46630778a172964739c68827e6f776ffd66e77",
+    "care-results.json": "76de2c8696b79a138e530f041b895c6a643748e38f2575a8033ab33d83de6028",
+    "mid-results.json": "bf92a83105c57300968fd469141f1a4010ddce6214efe2e12f2a723b87a5c943",
+    "nights.csv": "0eb22c76be89487ebeb3c73aa17d1af9ce4ef27af140cb7372c53539167c2927",
+    "people.csv": "e02e2c1271ce65905f3f66d63ded532ccbb63dbcc1517eba379ee461e8a734ad",
+    "replay-verification.json": "b578c1eca6f54b1f97421133fcc6a88a3c5782096ac8d505f00c6d7c686bc583",
+    "report.md": "2cd1c93cba9d81443bd92833b38ce7fb9a69a9b6442c0d08f22e6a339c20deab",
+    "run-audit.mjs": "957aa035bca93a48679975315a4a61e080e7124f717daf3b61076825bc542efc",
+    "runs.csv": "9ab477a1db65c93a2fd5881ae637f0c35f3c09e86966760619c65eeba6cc05de",
+    "source-manifest.json": "97afae354104b4831e4e9e39eb8d1030161e165507285b6ca654396766af2834",
+    "summary.json": "bbee468a518aa6b8b6f5f3a74bf7ac4467ab1c598756cdfed3b44e00b1f4e49c"
+  }
+}

@@ -1,0 +1,396 @@
+{
+  "generatedWith": "built-in image_gen.imagegen",
+  "frameWidth": 362,
+  "frameHeight": 362,
+  "columns": 4,
+  "rows": 3,
+  "note": "Original PNGs are unchanged. Frame-specific alpha-bound center and foot origin registers visual content without editing pixels. Use one constant scale per species; do not resize every frame to its bounds.",
+  "sheets": [
+    {
+      "file": "creatures-walk-a-v4.png",
+      "width": 1448,
+      "height": 1086,
+      "transparentPct": 79.6,
+      "species": [
+        "walker",
+        "climber",
+        "rammer"
+      ],
+      "frames": [
+        {
+          "frame": 0,
+          "species": "walker",
+          "phase": 0,
+          "bounds": [
+            110,
+            180,
+            323,
+            318
+          ],
+          "origin": [
+            0.599448,
+            0.881215
+          ]
+        },
+        {
+          "frame": 1,
+          "species": "walker",
+          "phase": 1,
+          "bounds": [
+            96,
+            180,
+            295,
+            314
+          ],
+          "origin": [
+            0.541436,
+            0.870166
+          ]
+        },
+        {
+          "frame": 2,
+          "species": "walker",
+          "phase": 2,
+          "bounds": [
+            66,
+            181,
+            269,
+            322
+          ],
+          "origin": [
+            0.464088,
+            0.892265
+          ]
+        },
+        {
+          "frame": 3,
+          "species": "walker",
+          "phase": 3,
+          "bounds": [
+            46,
+            180,
+            250,
+            315
+          ],
+          "origin": [
+            0.410221,
+            0.872928
+          ]
+        },
+        {
+          "frame": 4,
+          "species": "climber",
+          "phase": 0,
+          "bounds": [
+            107,
+            116,
+            323,
+            297
+          ],
+          "origin": [
+            0.595304,
+            0.823204
+          ]
+        },
+        {
+          "frame": 5,
+          "species": "climber",
+          "phase": 1,
+          "bounds": [
+            96,
+            116,
+            302,
+            297
+          ],
+          "origin": [
+            0.551105,
+            0.823204
+          ]
+        },
+        {
+          "frame": 6,
+          "species": "climber",
+          "phase": 2,
+          "bounds": [
+            69,
+            117,
+            285,
+            298
+          ],
+          "origin": [
+            0.490331,
+            0.825967
+          ]
+        },
+        {
+          "frame": 7,
+          "species": "climber",
+          "phase": 3,
+          "bounds": [
+            53,
+            115,
+            261,
+            294
+          ],
+          "origin": [
+            0.435083,
+            0.814917
+          ]
+        },
+        {
+          "frame": 8,
+          "species": "rammer",
+          "phase": 0,
+          "bounds": [
+            109,
+            76,
+            332,
+            224
+          ],
+          "origin": [
+            0.610497,
+            0.621547
+          ]
+        },
+        {
+          "frame": 9,
+          "species": "rammer",
+          "phase": 1,
+          "bounds": [
+            95,
+            72,
+            315,
+            220
+          ],
+          "origin": [
+            0.56768,
+            0.610497
+          ]
+        },
+        {
+          "frame": 10,
+          "species": "rammer",
+          "phase": 2,
+          "bounds": [
+            65,
+            75,
+            282,
+            223
+          ],
+          "origin": [
+            0.480663,
+            0.618785
+          ]
+        },
+        {
+          "frame": 11,
+          "species": "rammer",
+          "phase": 3,
+          "bounds": [
+            51,
+            75,
+            263,
+            220
+          ],
+          "origin": [
+            0.435083,
+            0.610497
+          ]
+        }
+      ]
+    },
+    {
+      "file": "creatures-walk-b-v4.png",
+      "width": 1448,
+      "height": 1086,
+      "transparentPct": 78.5,
+      "species": [
+        "caller",
+        "burrower",
+        "quencher"
+      ],
+      "frames": [
+        {
+          "frame": 0,
+          "species": "caller",
+          "phase": 0,
+          "bounds": [
+            66,
+            144,
+            283,
+            348
+          ],
+          "origin": [
+            0.483425,
+            0.964088
+          ]
+        },
+        {
+          "frame": 1,
+          "species": "caller",
+          "phase": 1,
+          "bounds": [
+            72,
+            143,
+            278,
+            343
+          ],
+          "origin": [
+            0.484807,
+            0.950276
+          ]
+        },
+        {
+          "frame": 2,
+          "species": "caller",
+          "phase": 2,
+          "bounds": [
+            66,
+            143,
+            286,
+            348
+          ],
+          "origin": [
+            0.487569,
+            0.964088
+          ]
+        },
+        {
+          "frame": 3,
+          "species": "caller",
+          "phase": 3,
+          "bounds": [
+            65,
+            144,
+            269,
+            343
+          ],
+          "origin": [
+            0.462707,
+            0.950276
+          ]
+        },
+        {
+          "frame": 4,
+          "species": "burrower",
+          "phase": 0,
+          "bounds": [
+            72,
+            134,
+            318,
+            290
+          ],
+          "origin": [
+            0.540055,
+            0.803867
+          ]
+        },
+        {
+          "frame": 5,
+          "species": "burrower",
+          "phase": 1,
+          "bounds": [
+            83,
+            135,
+            314,
+            281
+          ],
+          "origin": [
+            0.549724,
+            0.779006
+          ]
+        },
+        {
+          "frame": 6,
+          "species": "burrower",
+          "phase": 2,
+          "bounds": [
+            64,
+            134,
+            304,
+            295
+          ],
+          "origin": [
+            0.509669,
+            0.81768
+          ]
+        },
+        {
+          "frame": 7,
+          "species": "burrower",
+          "phase": 3,
+          "bounds": [
+            67,
+            137,
+            290,
+            284
+          ],
+          "origin": [
+            0.494475,
+            0.787293
+          ]
+        },
+        {
+          "frame": 8,
+          "species": "quencher",
+          "phase": 0,
+          "bounds": [
+            76,
+            66,
+            298,
+            236
+          ],
+          "origin": [
+            0.517956,
+            0.654696
+          ]
+        },
+        {
+          "frame": 9,
+          "species": "quencher",
+          "phase": 1,
+          "bounds": [
+            93,
+            67,
+            293,
+            231
+          ],
+          "origin": [
+            0.53453,
+            0.640884
+          ]
+        },
+        {
+          "frame": 10,
+          "species": "quencher",
+          "phase": 2,
+          "bounds": [
+            79,
+            70,
+            305,
+            239
+          ],
+          "origin": [
+            0.531768,
+            0.662983
+          ]
+        },
+        {
+          "frame": 11,
+          "species": "quencher",
+          "phase": 3,
+          "bounds": [
+            78,
+            67,
+            270,
+            237
+          ],
+          "origin": [
+            0.482044,
+            0.657459
+          ]
+        }
+      ]
+    }
+  ]
+}

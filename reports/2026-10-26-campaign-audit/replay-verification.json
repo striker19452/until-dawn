@@ -1,0 +1,17 @@
+[
+  {
+    "id": "active-repairman-1-53",
+    "passed": true,
+    "nights": 7
+  },
+  {
+    "id": "active-repairman-3-53",
+    "passed": true,
+    "nights": 19
+  },
+  {
+    "id": "active-repairman-5-53",
+    "passed": true,
+    "nights": 28
+  }
+]

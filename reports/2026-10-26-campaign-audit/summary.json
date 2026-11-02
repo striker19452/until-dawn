@@ -1,0 +1,296 @@
+{
+  "date": "2026-10-26",
+  "runs": 60,
+  "phases": {
+    "failed": 41,
+    "rescued": 19
+  },
+  "simulatedNights": 1074,
+  "testErrors": 0,
+  "sourceChanges": [],
+  "replayChecks": [
+    {
+      "id": "active-repairman-1-53",
+      "passed": true,
+      "nights": 7
+    },
+    {
+      "id": "active-repairman-3-53",
+      "passed": true,
+      "nights": 19
+    },
+    {
+      "id": "active-repairman-5-53",
+      "passed": true,
+      "nights": 28
+    }
+  ],
+  "groups": [
+    {
+      "group": "active",
+      "size": 1,
+      "runs": 9,
+      "wins": 0,
+      "meanLastDay": 7.9,
+      "finalLivingHealth": 14.1,
+      "finalLivingFear": 91.9,
+      "finalLivingFatigue": 98.4,
+      "finalHeroFatigue": 98.4,
+      "resources": {
+        "food": 7.3,
+        "water": 8.8,
+        "materials": 8.6,
+        "fuel": 27.1,
+        "medicine": 1.1,
+        "parts": 13
+      }
+    },
+    {
+      "group": "active",
+      "size": 2,
+      "runs": 3,
+      "wins": 0,
+      "meanLastDay": 11,
+      "finalLivingHealth": 17.1,
+      "finalLivingFear": 84.5,
+      "finalLivingFatigue": 63.5,
+      "finalHeroFatigue": 95.2,
+      "resources": {
+        "food": 19,
+        "water": 4.7,
+        "materials": 9.7,
+        "fuel": 34,
+        "medicine": 0.3,
+        "parts": 17.3
+      }
+    },
+    {
+      "group": "active",
+      "size": 3,
+      "runs": 9,
+      "wins": 0,
+      "meanLastDay": 20.4,
+      "finalLivingHealth": 23.9,
+      "finalLivingFear": 89.6,
+      "finalLivingFatigue": 61.7,
+      "finalHeroFatigue": 99.9,
+      "resources": {
+        "food": 62.3,
+        "water": 42.1,
+        "materials": 10,
+        "fuel": 65.1,
+        "medicine": 1.7,
+        "parts": 34.4
+      }
+    },
+    {
+      "group": "active",
+      "size": 4,
+      "runs": 3,
+      "wins": 3,
+      "meanLastDay": 28,
+      "finalLivingHealth": 98.7,
+      "finalLivingFear": 4.0,
+      "finalLivingFatigue": 29.2,
+      "finalHeroFatigue": 58.0,
+      "resources": {
+        "food": 77.7,
+        "water": 35,
+        "materials": 8.7,
+        "fuel": 173,
+        "medicine": 2,
+        "parts": 42.7
+      }
+    },
+    {
+      "group": "active",
+      "size": 5,
+      "runs": 9,
+      "wins": 9,
+      "meanLastDay": 28,
+      "finalLivingHealth": 100,
+      "finalLivingFear": 0,
+      "finalLivingFatigue": 15.9,
+      "finalHeroFatigue": 41.9,
+      "resources": {
+        "food": 53,
+        "water": 12.4,
+        "materials": 12,
+        "fuel": 176.7,
+        "medicine": 3,
+        "parts": 44.4
+      }
+    },
+    {
+      "group": "idle",
+      "size": 1,
+      "runs": 3,
+      "wins": 0,
+      "meanLastDay": 2.3,
+      "finalLivingHealth": 53.0,
+      "finalLivingFear": 86.3,
+      "finalLivingFatigue": 68.7,
+      "finalHeroFatigue": 68.7,
+      "resources": {
+        "food": 3.7,
+        "water": 7.3,
+        "materials": 9,
+        "fuel": 10,
+        "medicine": 2,
+        "parts": 3.7
+      }
+    },
+    {
+      "group": "idle",
+      "size": 3,
+      "runs": 3,
+      "wins": 0,
+      "meanLastDay": 11.3,
+      "finalLivingHealth": 15.6,
+      "finalLivingFear": 86.1,
+      "finalLivingFatigue": 61.1,
+      "finalHeroFatigue": 92.2,
+      "resources": {
+        "food": 29.7,
+        "water": 20.7,
+        "materials": 13.3,
+        "fuel": 33,
+        "medicine": 0.3,
+        "parts": 16.7
+      }
+    },
+    {
+      "group": "idle",
+      "size": 5,
+      "runs": 3,
+      "wins": 1,
+      "meanLastDay": 25.3,
+      "finalLivingHealth": 40.6,
+      "finalLivingFear": 45.2,
+      "finalLivingFatigue": 38.8,
+      "finalHeroFatigue": 99.1,
+      "resources": {
+        "food": 51.7,
+        "water": 14.3,
+        "materials": 10.3,
+        "fuel": 158.3,
+        "medicine": 2.7,
+        "parts": 40
+      }
+    },
+    {
+      "group": "rotate",
+      "size": 1,
+      "runs": 3,
+      "wins": 0,
+      "meanLastDay": 7,
+      "finalLivingHealth": 11.0,
+      "finalLivingFear": 88.2,
+      "finalLivingFatigue": 95.3,
+      "finalHeroFatigue": 95.3,
+      "resources": {
+        "food": 7.7,
+        "water": 9,
+        "materials": 6,
+        "fuel": 23.3,
+        "medicine": 0.7,
+        "parts": 11.3
+      }
+    },
+    {
+      "group": "rotate",
+      "size": 3,
+      "runs": 3,
+      "wins": 0,
+      "meanLastDay": 20,
+      "finalLivingHealth": 27.6,
+      "finalLivingFear": 82.1,
+      "finalLivingFatigue": 51.6,
+      "finalHeroFatigue": 100,
+      "resources": {
+        "food": 55.3,
+        "water": 37.3,
+        "materials": 16,
+        "fuel": 65,
+        "medicine": 2,
+        "parts": 34.7
+      }
+    },
+    {
+      "group": "rotate",
+      "size": 5,
+      "runs": 3,
+      "wins": 3,
+      "meanLastDay": 28,
+      "finalLivingHealth": 100,
+      "finalLivingFear": 0,
+      "finalLivingFatigue": 17.5,
+      "finalHeroFatigue": 48.1,
+      "resources": {
+        "food": 49.7,
+        "water": 14,
+        "materials": 11,
+        "fuel": 175,
+        "medicine": 2,
+        "parts": 44
+      }
+    },
+    {
+      "group": "care",
+      "size": 1,
+      "runs": 3,
+      "wins": 0,
+      "meanLastDay": 7,
+      "finalLivingHealth": 13.0,
+      "finalLivingFear": 84.5,
+      "finalLivingFatigue": 100,
+      "finalHeroFatigue": 100,
+      "resources": {
+        "food": 7.7,
+        "water": 9.7,
+        "materials": 7.7,
+        "fuel": 23.3,
+        "medicine": 0,
+        "parts": 11
+      }
+    },
+    {
+      "group": "care",
+      "size": 3,
+      "runs": 3,
+      "wins": 0,
+      "meanLastDay": 21,
+      "finalLivingHealth": 20.5,
+      "finalLivingFear": 90.5,
+      "finalLivingFatigue": 78.2,
+      "finalHeroFatigue": 100,
+      "resources": {
+        "food": 56,
+        "water": 44.3,
+        "materials": 17.3,
+        "fuel": 67,
+        "medicine": 2,
+        "parts": 36
+      }
+    },
+    {
+      "group": "care",
+      "size": 5,
+      "runs": 3,
+      "wins": 3,
+      "meanLastDay": 28,
+      "finalLivingHealth": 100,
+      "finalLivingFear": 0,
+      "finalLivingFatigue": 16.2,
+      "finalHeroFatigue": 39.1,
+      "resources": {
+        "food": 50.7,
+        "water": 14,
+        "materials": 13.3,
+        "fuel": 73,
+        "medicine": 2,
+        "parts": 40
+      }
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "tool": "Built-in image_gen",
+  "reference": "client/assets/yard-day-hd-v4.webp",
+  "assets": {
+    "victory": {
+      "prompt": "Use case: illustration-story. Asset type: full-bleed victory ending illustration for the Chinese courtyard survival game 等到天亮. Reference image is STYLE AND SETTING reference only; create a new cinematic eye-level composition. An old small Chinese countryside courtyard with warm grey tile roof cottage, rough stone fence and wooden gate, autumn weeds, a modest campfire ring. At the end of 28 nights the gate is open to a quiet golden dawn; outside the gate two distant human rescuers with a lantern approach along the road, a small utilitarian rescue truck barely visible in the mist. Hopeful, earned relief, warm window light and soft sun rays through cool morning mist. Detailed hand-painted storybook game concept art, subtle gouache and ink texture, weathered ochre, moss grey, dusty olive, amber light, matching the reference's tactile materials. Landscape 3:2 composition, view from inside the yard looking toward the gate, strong depth; image should also crop gracefully to a vertical center slice. Cottage and gate recognizable, no foreground portraits, no fixed number of survivor characters, no fantasy architecture. This is artwork only: no lettering, no logos, no interface, no borders, no watermarks.",
+      "source": "victory-source.png",
+      "runtime": "victory.webp"
+    },
+    "defeat": {
+      "prompt": "Use case: illustration-story. Asset type: full-bleed defeat ending illustration for the Chinese courtyard survival game 等到天亮. Reference image is STYLE AND SETTING reference only; create a new cinematic eye-level composition. An old small Chinese countryside courtyard with warm grey tile roof cottage, rough stone fence and wooden gate, autumn weeds, a modest campfire ring. Before dawn after a failed defense: the wooden gate has been broken inward, a few loose planks and fallen fence stones lie along the path; the cottage window is dark except one dim ember of amber light, the campfire has only three glowing embers in grey ash. Cold rain and fog drift into the empty courtyard. Sombre, quiet and dignified, a feeling of interruption and another chance, no gore, no bodies, no fire engulfing the house, no huge monster. Detailed hand-painted storybook game concept art, subtle gouache and ink texture, weathered indigo, charcoal, slate grey and tiny ember orange, matching the reference's tactile materials. Landscape 3:2 composition, view from inside the yard looking toward the gate, strong depth; image should also crop gracefully to a vertical center slice. Cottage and gate recognizable, no foreground portraits, no characters. Artwork only: no lettering, no logos, no interface, no borders, no watermarks.",
+      "source": "defeat-source.png",
+      "runtime": "defeat.webp"
+    }
+  }
+}

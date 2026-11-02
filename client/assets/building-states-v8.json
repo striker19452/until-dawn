@@ -1,0 +1,359 @@
+{
+  "version": 8,
+  "width": 1024,
+  "height": 1024,
+  "frames": {
+    "garden-damaged": {
+      "rect": [
+        0,
+        0,
+        256,
+        256
+      ],
+      "bounds": [
+        10,
+        56,
+        246,
+        246
+      ],
+      "origin": [
+        0.5,
+        0.9609375
+      ],
+      "scaleWidth": 379.5146685983339,
+      "type": "garden",
+      "state": "damaged",
+      "sha256": "ff667d2cb578ef65ef1e669924ca68ba07566efddc99766b9a040c5016c0aa69"
+    },
+    "garden-destroyed": {
+      "rect": [
+        256,
+        0,
+        256,
+        256
+      ],
+      "bounds": [
+        10,
+        78,
+        246,
+        246
+      ],
+      "origin": [
+        0.5,
+        0.9609375
+      ],
+      "scaleWidth": 379.5146685983339,
+      "type": "garden",
+      "state": "destroyed",
+      "sha256": "e2062b9663980f96c1f63bb42ed02dc7d64d5cb04e7ac1beca5d846771a46299"
+    },
+    "water-damaged": {
+      "rect": [
+        512,
+        0,
+        256,
+        256
+      ],
+      "bounds": [
+        30,
+        10,
+        225,
+        246
+      ],
+      "origin": [
+        0.498046875,
+        0.9609375
+      ],
+      "scaleWidth": 392.6590909090909,
+      "type": "water",
+      "state": "damaged",
+      "sha256": "e4e1f83aac4c2a10c7231483a7496d8b2fffc117ef7accc19270b1eab238b02f"
+    },
+    "water-destroyed": {
+      "rect": [
+        768,
+        0,
+        256,
+        256
+      ],
+      "bounds": [
+        10,
+        95,
+        246,
+        246
+      ],
+      "origin": [
+        0.5,
+        0.9609375
+      ],
+      "scaleWidth": 475.21818181818173,
+      "type": "water",
+      "state": "destroyed",
+      "sha256": "4d061a896bcd6ddb3fc6f849fc6724d30c9212ac234c795cb79ee5b7e1a4aa19"
+    },
+    "workshop-damaged": {
+      "rect": [
+        0,
+        256,
+        256,
+        256
+      ],
+      "bounds": [
+        10,
+        19,
+        246,
+        246
+      ],
+      "origin": [
+        0.5,
+        0.9609375
+      ],
+      "scaleWidth": 399.3430099312452,
+      "type": "workshop",
+      "state": "damaged",
+      "sha256": "2d85989708ef1947fa934f7c6149bcb7329baa475a265bbd8d1a44009eeb0095"
+    },
+    "workshop-destroyed": {
+      "rect": [
+        256,
+        256,
+        256,
+        256
+      ],
+      "bounds": [
+        10,
+        46,
+        246,
+        246
+      ],
+      "origin": [
+        0.5,
+        0.9609375
+      ],
+      "scaleWidth": 399.3430099312452,
+      "type": "workshop",
+      "state": "destroyed",
+      "sha256": "b1f095be5c5d9efe4011844af2fb1524f0a893672338a870b147fb3dd1e55214"
+    },
+    "generator-damaged": {
+      "rect": [
+        512,
+        256,
+        256,
+        256
+      ],
+      "bounds": [
+        10,
+        74,
+        246,
+        246
+      ],
+      "origin": [
+        0.5,
+        0.9609375
+      ],
+      "scaleWidth": 415.97459309249695,
+      "type": "generator",
+      "state": "damaged",
+      "sha256": "ee4ca1dc22a32b4cbc78872d720c61f8125cbbd8200d2f576dfb8e01477eb1b8"
+    },
+    "generator-destroyed": {
+      "rect": [
+        768,
+        256,
+        256,
+        256
+      ],
+      "bounds": [
+        10,
+        93,
+        246,
+        246
+      ],
+      "origin": [
+        0.5,
+        0.9609375
+      ],
+      "scaleWidth": 415.97459309249695,
+      "type": "generator",
+      "state": "destroyed",
+      "sha256": "3c66054049322916a0f8d415c459af3155667c64eef838d6392bb8fad21ffe1d"
+    },
+    "infirmary-damaged": {
+      "rect": [
+        0,
+        512,
+        256,
+        256
+      ],
+      "bounds": [
+        10,
+        53,
+        246,
+        246
+      ],
+      "origin": [
+        0.5,
+        0.9609375
+      ],
+      "scaleWidth": 392.0089786756453,
+      "type": "infirmary",
+      "state": "damaged",
+      "sha256": "ae6e614644acf490d79d30e237fcdb48a1e20ccc5725f4cb3931bc39082aa099"
+    },
+    "infirmary-destroyed": {
+      "rect": [
+        256,
+        512,
+        256,
+        256
+      ],
+      "bounds": [
+        10,
+        85,
+        246,
+        246
+      ],
+      "origin": [
+        0.5,
+        0.9609375
+      ],
+      "scaleWidth": 392.0089786756453,
+      "type": "infirmary",
+      "state": "destroyed",
+      "sha256": "2177017adf31ba81d12da95fa99a66816d0b5a4ac6750a165c1b5987b4778459"
+    },
+    "watchtower-damaged": {
+      "rect": [
+        512,
+        512,
+        256,
+        256
+      ],
+      "bounds": [
+        33,
+        10,
+        223,
+        246
+      ],
+      "origin": [
+        0.5,
+        0.9609375
+      ],
+      "scaleWidth": 371.4474845542806,
+      "type": "watchtower",
+      "state": "damaged",
+      "sha256": "6f5f4f50c5b39611fc2061c537b6c10e01b51ee8deb358bfb703e8e7f5169657"
+    },
+    "watchtower-destroyed": {
+      "rect": [
+        768,
+        512,
+        256,
+        256
+      ],
+      "bounds": [
+        10,
+        11,
+        246,
+        246
+      ],
+      "origin": [
+        0.5,
+        0.9609375
+      ],
+      "scaleWidth": 461.3768755516328,
+      "type": "watchtower",
+      "state": "destroyed",
+      "sha256": "458f0d354b7c05287916f23d12600b21ae8eea0057e75a3cdb3ee072bfb27570"
+    },
+    "stove-damaged": {
+      "rect": [
+        0,
+        768,
+        256,
+        256
+      ],
+      "bounds": [
+        10,
+        14,
+        246,
+        246
+      ],
+      "origin": [
+        0.5,
+        0.9609375
+      ],
+      "scaleWidth": 415.03771337832467,
+      "type": "stove",
+      "state": "damaged",
+      "sha256": "b1f8f4d682373da023724ae940b3b65d1a10384ad9b14f72387f65201b02f1b9"
+    },
+    "stove-destroyed": {
+      "rect": [
+        256,
+        768,
+        256,
+        256
+      ],
+      "bounds": [
+        10,
+        67,
+        246,
+        246
+      ],
+      "origin": [
+        0.5,
+        0.9609375
+      ],
+      "scaleWidth": 415.03771337832467,
+      "type": "stove",
+      "state": "destroyed",
+      "sha256": "46985114a8c37e3015409f43241522f152737114f6c7a4d454cdab4e95e7cca8"
+    },
+    "exchange-damaged": {
+      "rect": [
+        512,
+        768,
+        256,
+        256
+      ],
+      "bounds": [
+        18,
+        10,
+        238,
+        246
+      ],
+      "origin": [
+        0.5,
+        0.9609375
+      ],
+      "scaleWidth": 386.08695652173907,
+      "type": "exchange",
+      "state": "damaged",
+      "sha256": "78d9aef6f8396c5663c790df2eb6470e76d0fade043a6b70838cb5a113be4fc8"
+    },
+    "exchange-destroyed": {
+      "rect": [
+        768,
+        768,
+        256,
+        256
+      ],
+      "bounds": [
+        10,
+        55,
+        246,
+        246
+      ],
+      "origin": [
+        0.5,
+        0.9609375
+      ],
+      "scaleWidth": 414.1660079051383,
+      "type": "exchange",
+      "state": "destroyed",
+      "sha256": "1e57ef7fc6a73ed75336fd0b4f5e5dde703cf67e787903b59df05e84d13331bd"
+    }
+  }
+}

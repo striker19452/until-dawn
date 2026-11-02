@@ -1,0 +1,445 @@
+{
+  "source": "survivors-wounded-v1.png",
+  "file": "survivors-wounded-atlas-v1.webp",
+  "width": 1536,
+  "height": 1536,
+  "columns": 4,
+  "rows": 4,
+  "cellSize": 384,
+  "baseFacing": 1,
+  "note": "Eight identities; seated and ground-supported retreat. Per-person scale is shared by both poses. Source pixels are never resized or repainted; only transparent packing.",
+  "frames": [
+    {
+      "person": "hero",
+      "pose": "seated",
+      "rect": [
+        0,
+        0,
+        384,
+        384
+      ],
+      "bounds": [
+        45,
+        83,
+        338,
+        344
+      ],
+      "origin": [
+        0.498698,
+        0.895833
+      ],
+      "renderScale": 0.194412,
+      "sourceBounds": [
+        43,
+        59,
+        336,
+        320
+      ]
+    },
+    {
+      "person": "hero",
+      "pose": "crawl",
+      "rect": [
+        384,
+        0,
+        384,
+        384
+      ],
+      "bounds": [
+        49,
+        138,
+        334,
+        344
+      ],
+      "origin": [
+        0.498698,
+        0.895833
+      ],
+      "renderScale": 0.194412,
+      "sourceBounds": [
+        339,
+        106,
+        624,
+        312
+      ]
+    },
+    {
+      "person": "lin",
+      "pose": "seated",
+      "rect": [
+        768,
+        0,
+        384,
+        384
+      ],
+      "bounds": [
+        60,
+        90,
+        324,
+        344
+      ],
+      "origin": [
+        0.5,
+        0.895833
+      ],
+      "renderScale": 0.200759,
+      "sourceBounds": [
+        662,
+        70,
+        926,
+        324
+      ]
+    },
+    {
+      "person": "lin",
+      "pose": "crawl",
+      "rect": [
+        1152,
+        0,
+        384,
+        384
+      ],
+      "bounds": [
+        50,
+        147,
+        333,
+        344
+      ],
+      "origin": [
+        0.498698,
+        0.895833
+      ],
+      "renderScale": 0.200759,
+      "sourceBounds": [
+        951,
+        111,
+        1234,
+        308
+      ]
+    },
+    {
+      "person": "zhou",
+      "pose": "seated",
+      "rect": [
+        0,
+        384,
+        384,
+        384
+      ],
+      "bounds": [
+        42,
+        87,
+        342,
+        344
+      ],
+      "origin": [
+        0.5,
+        0.895833
+      ],
+      "renderScale": 0.199719,
+      "sourceBounds": [
+        37,
+        373,
+        337,
+        630
+      ]
+    },
+    {
+      "person": "zhou",
+      "pose": "crawl",
+      "rect": [
+        384,
+        384,
+        384,
+        384
+      ],
+      "bounds": [
+        44,
+        138,
+        339,
+        344
+      ],
+      "origin": [
+        0.498698,
+        0.895833
+      ],
+      "renderScale": 0.199719,
+      "sourceBounds": [
+        339,
+        416,
+        634,
+        622
+      ]
+    },
+    {
+      "person": "chen",
+      "pose": "seated",
+      "rect": [
+        768,
+        384,
+        384,
+        384
+      ],
+      "bounds": [
+        45,
+        93,
+        338,
+        344
+      ],
+      "origin": [
+        0.498698,
+        0.895833
+      ],
+      "renderScale": 0.202325,
+      "sourceBounds": [
+        651,
+        380,
+        944,
+        631
+      ]
+    },
+    {
+      "person": "chen",
+      "pose": "crawl",
+      "rect": [
+        1152,
+        384,
+        384,
+        384
+      ],
+      "bounds": [
+        52,
+        148,
+        332,
+        344
+      ],
+      "origin": [
+        0.5,
+        0.895833
+      ],
+      "renderScale": 0.202325,
+      "sourceBounds": [
+        950,
+        434,
+        1230,
+        630
+      ]
+    },
+    {
+      "person": "xu",
+      "pose": "seated",
+      "rect": [
+        0,
+        768,
+        384,
+        384
+      ],
+      "bounds": [
+        43,
+        84,
+        341,
+        344
+      ],
+      "origin": [
+        0.5,
+        0.895833
+      ],
+      "renderScale": 0.184533,
+      "sourceBounds": [
+        39,
+        658,
+        337,
+        918
+      ]
+    },
+    {
+      "person": "xu",
+      "pose": "crawl",
+      "rect": [
+        384,
+        768,
+        384,
+        384
+      ],
+      "bounds": [
+        46,
+        139,
+        338,
+        344
+      ],
+      "origin": [
+        0.5,
+        0.895833
+      ],
+      "renderScale": 0.184533,
+      "sourceBounds": [
+        338,
+        713,
+        630,
+        918
+      ]
+    },
+    {
+      "person": "yuan",
+      "pose": "seated",
+      "rect": [
+        768,
+        768,
+        384,
+        384
+      ],
+      "bounds": [
+        45,
+        83,
+        338,
+        344
+      ],
+      "origin": [
+        0.498698,
+        0.895833
+      ],
+      "renderScale": 0.192167,
+      "sourceBounds": [
+        656,
+        659,
+        949,
+        920
+      ]
+    },
+    {
+      "person": "yuan",
+      "pose": "crawl",
+      "rect": [
+        1152,
+        768,
+        384,
+        384
+      ],
+      "bounds": [
+        46,
+        146,
+        338,
+        344
+      ],
+      "origin": [
+        0.5,
+        0.895833
+      ],
+      "renderScale": 0.192167,
+      "sourceBounds": [
+        950,
+        719,
+        1242,
+        917
+      ]
+    },
+    {
+      "person": "meng",
+      "pose": "seated",
+      "rect": [
+        0,
+        1152,
+        384,
+        384
+      ],
+      "bounds": [
+        29,
+        68,
+        355,
+        344
+      ],
+      "origin": [
+        0.5,
+        0.895833
+      ],
+      "renderScale": 0.175504,
+      "sourceBounds": [
+        24,
+        931,
+        350,
+        1207
+      ]
+    },
+    {
+      "person": "meng",
+      "pose": "crawl",
+      "rect": [
+        384,
+        1152,
+        384,
+        384
+      ],
+      "bounds": [
+        47,
+        143,
+        337,
+        344
+      ],
+      "origin": [
+        0.5,
+        0.895833
+      ],
+      "renderScale": 0.175504,
+      "sourceBounds": [
+        344,
+        996,
+        634,
+        1197
+      ]
+    },
+    {
+      "person": "visitor",
+      "pose": "seated",
+      "rect": [
+        768,
+        1152,
+        384,
+        384
+      ],
+      "bounds": [
+        47,
+        81,
+        337,
+        344
+      ],
+      "origin": [
+        0.5,
+        0.895833
+      ],
+      "renderScale": 0.182587,
+      "sourceBounds": [
+        649,
+        943,
+        939,
+        1206
+      ]
+    },
+    {
+      "person": "visitor",
+      "pose": "crawl",
+      "rect": [
+        1152,
+        1152,
+        384,
+        384
+      ],
+      "bounds": [
+        47,
+        142,
+        337,
+        344
+      ],
+      "origin": [
+        0.5,
+        0.895833
+      ],
+      "renderScale": 0.182587,
+      "sourceBounds": [
+        947,
+        1001,
+        1237,
+        1203
+      ]
+    }
+  ]
+}

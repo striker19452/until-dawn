@@ -1,0 +1,75 @@
+*{box-sizing:border-box}html{background:#14231f}body{margin:0;background:radial-gradient(ellipse at 50% 20%,#415045,#172620 75%);color:#eee4cb;min-height:100dvh;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif}button,select{font:inherit}button{cursor:pointer}button:focus-visible,select:focus-visible{outline:3px solid #a7cb92;outline-offset:3px}.cursor-interaction{cursor:pointer}
+
+#first-light-game{padding:16px 0;display:flex;justify-content:center}
+#first-light-game .fl-phone{--fl-bg:#202c2a;--fl-paper:#ece2ca;--fl-paper-ink:#333d34;--fl-soft:#bfc6b6;--fl-line:#566055;--fl-warm:#dba960;--fl-dark:#1d2825;--fl-danger:#8b4533;width:min(100%,430px);box-sizing:border-box;background:var(--fl-bg);color:#f0e9d5;border:1px solid #596155;border-radius:24px;box-shadow:0 16px 45px #13201928;overflow:hidden;font:14px/1.6 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft Yahei",sans-serif;color-scheme:dark}
+#first-light-game *{box-sizing:border-box}
+#first-light-game button,#first-light-game select{font:inherit;touch-action:manipulation}
+#first-light-game button{min-height:44px;white-space:normal}
+#first-light-game button:disabled{opacity:.48;cursor:not-allowed}
+#first-light-game h1,#first-light-game h2,#first-light-game h3,#first-light-game p{margin:0}
+#first-light-game .fl-header{display:flex;justify-content:space-between;align-items:center;padding:20px 18px 14px;gap:8px}
+#first-light-game .fl-kicker{font-size:11px;letter-spacing:1px;color:var(--fl-soft)}
+#first-light-game h1{font-family:"Songti SC",STSong,serif;font-size:27px;letter-spacing:3px;font-weight:500;line-height:1.35}
+#first-light-game h1 span{font-family:inherit;display:inline-block;font-size:11px;letter-spacing:1px;border-left:1px solid var(--fl-line);padding-left:9px;margin-left:10px;color:var(--fl-warm)}
+#first-light-game .fl-edition{font-size:11px;color:var(--fl-soft);writing-mode:vertical-rl;letter-spacing:2px;flex:none}
+#first-light-game .fl-day{padding:0 18px 10px;display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--fl-soft)}
+#first-light-game .fl-day>div{display:flex;align-items:center;gap:7px}
+#first-light-game strong{font-weight:500}
+#first-light-game svg{width:16px;height:16px;flex:none}
+#first-light-game .fl-resources{display:grid;grid-template-columns:repeat(4,1fr);padding:11px 8px;background:#293630;border-top:1px solid #485347;border-bottom:1px solid #485347;gap:4px}
+#first-light-game .fl-resource{display:flex;align-items:center;justify-content:center;gap:5px;font-size:12px;flex-wrap:wrap}
+#first-light-game .fl-resource strong{font-size:16px;font-variant-numeric:tabular-nums}
+#first-light-game .fl-radio{display:flex;align-items:center;width:100%;gap:9px;border:0;background:#344039;color:#ddd9bd;text-align:left;padding:10px 17px;font-size:12px}
+#first-light-game .fl-radio span:first-of-type{flex:1}
+#first-light-game .fl-scene{position:relative;height:286px;background:#626d5d}
+#first-light-game canvas{display:block;width:100%;height:100%}
+#first-light-game .fl-scene-note{position:absolute;top:11px;left:14px;color:#fff3d0;text-shadow:0 1px 5px #17251d;font-family:"Songti SC",STSong,serif;font-size:12px;pointer-events:none}
+#first-light-game .fl-place{position:absolute;background:#253329ed;color:#f4e8cb;border:1px solid #939077a6;border-radius:5px 8px 5px 7px;min-width:76px;padding:4px 8px;font-size:12px;line-height:1.4;box-shadow:0 2px 0 #17261c45;transform:rotate(-1deg)}
+#first-light-game .fl-place span{display:block;font-size:11px;color:#d0c8aa}
+#first-light-game .fl-home{top:26%;left:40%}
+#first-light-game .fl-garden{top:58%;left:7%;transform:rotate(1deg)}
+#first-light-game .fl-workbench{top:58%;right:7%;transform:rotate(1deg)}
+#first-light-game .fl-gate{bottom:7px;left:40%;min-width:78px}
+#first-light-game .fl-visitor{position:absolute;left:50%;bottom:58px;transform:translateX(-50%);padding:5px 13px;background:#e2b46a;color:#302d23;border:1px solid #50482f;border-radius:16px;white-space:nowrap;font-size:12px}
+#first-light-game [hidden]{display:none!important}
+#first-light-game .fl-message{padding:9px 16px;font-size:12px;min-height:39px;color:var(--fl-soft);border-bottom:1px solid #4c5749}
+#first-light-game .fl-sheet{margin:13px 12px 0;padding:16px;background:var(--fl-paper);color:var(--fl-paper-ink);border-radius:3px 9px 5px 7px;box-shadow:1px 2px 0 #111c1955;min-height:165px;color-scheme:light}
+#first-light-game .fl-eyebrow{display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:1px;color:#60664e;margin-bottom:5px}
+#first-light-game h2{font-size:18px;font-family:"Songti SC",STSong,serif;font-weight:500;margin-bottom:8px;letter-spacing:1px}
+#first-light-game .fl-copy{font-size:13px;line-height:1.75;margin-bottom:12px;color:#48503f}
+#first-light-game .fl-small{font-size:12px;color:#5b614d}
+#first-light-game .fl-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+#first-light-game .fl-button{border:1px solid #95967b;background:#e3d8be;color:#344235;border-radius:5px;padding:9px 12px;flex:1;font-size:13px;min-width:110px}
+#first-light-game .fl-button.fl-emphasis{background:#33483a;color:#f3e7cb;border-color:#33483a}
+#first-light-game .fl-button.fl-danger{color:var(--fl-danger);border-color:#a7795d}
+#first-light-game .fl-link{background:none;border:none;border-bottom:1px solid #b7ad8d;color:#4d5c43;text-align:left;padding:7px 0;min-height:44px;font-size:12px}
+#first-light-game .fl-row{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #c9c1a6;font-size:13px;align-items:center}
+#first-light-game .fl-row:last-child{border:0}
+#first-light-game .fl-primary-area{padding:12px}
+#first-light-game .fl-main{display:block;width:100%;background:#d8ac67;color:#292e25;border:1px solid #b79053;border-radius:6px;padding:12px;font-size:14px;letter-spacing:1px}
+#first-light-game .fl-main-note{text-align:center;font-size:11px;color:var(--fl-soft);margin-top:6px}
+#first-light-game .fl-nav{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid #53604f;background:#26352d;padding:5px 6px}
+#first-light-game .fl-nav button{background:transparent;border:0;color:#c0c7b5;padding:8px 1px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px}
+#first-light-game .fl-nav button[aria-current="page"]{color:#e8bc77;background:#344436;border-radius:7px}
+#first-light-game .fl-nav button>span{font-size:11px;display:inline;line-height:1}
+#first-light-game .fl-footer{font-size:11px;text-align:center;color:#b5beaa;padding:6px 4px 9px}
+#first-light-game .fl-location{width:100%;padding:11px 0;text-align:left;background:transparent;border:0;border-bottom:1px solid #beb89c;color:#374334;display:flex;align-items:center;gap:10px}
+#first-light-game .fl-location span{display:block;flex:1;font-size:13px}
+#first-light-game .fl-location small{display:block;color:#62664f;font-size:11px}
+#first-light-game .fl-tag{display:inline-block;padding:1px 6px;font-size:11px;border-radius:3px;background:#d6d7b8;color:#47533b}
+#first-light-game .fl-person{display:grid;grid-template-columns:40px 1fr;gap:10px;align-items:center;margin:12px 0}
+#first-light-game .fl-avatar{width:40px;height:44px;border-radius:40% 40% 6px 6px;background:#67755b;display:flex;align-items:center;justify-content:center;color:#f6e7c9;font-family:"Songti SC",serif;font-size:20px}
+#first-light-game .fl-person p{font-size:12px;color:#5e654e}
+#first-light-game label{display:block;margin-top:10px;font-size:12px;color:#505b43}
+#first-light-game select{width:100%;min-height:44px;padding:8px;background:#f1e7d2;color:#344235;border:1px solid #979d7f;border-radius:5px;font-size:16px;margin-top:5px}
+#first-light-game .fl-notice{padding:9px 10px;background:#e4d0a8;color:#58472d;border-left:3px solid #9a6e36;margin:10px 0;font-size:12px}
+#first-light-game .fl-journal{margin:0;padding-left:18px;font-size:12px;color:#50583f}
+#first-light-game .fl-journal li{padding-bottom:7px}
+#first-light-game .fl-progress{height:5px;border-radius:5px;background:#c9c2a4;margin:12px 0;overflow:hidden}
+#first-light-game .fl-progress div{height:100%;background:#677957;transition:width 600ms}
+#first-light-game .fl-night .fl-scene-note{color:#f0d298}
+@media(max-width:360px){#first-light-game .fl-header{padding:16px 12px 12px}#first-light-game h1{font-size:24px}#first-light-game .fl-sheet{margin:10px 8px 0;padding:13px}#first-light-game .fl-scene{height:260px}#first-light-game .fl-place{min-width:70px;padding:4px 6px}#first-light-game .fl-resource{gap:3px}}
+@media(max-width:360px){#first-light-game .fl-resource{display:grid;grid-template-columns:16px auto;gap:0 3px}#first-light-game .fl-resource strong{grid-column:1/-1;text-align:center;line-height:1.2}}
+@media(prefers-reduced-motion:reduce){#first-light-game .fl-progress div{transition:none}}
+
+#first-light-game .fl-savebar{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:7px 16px;background:#18251f;color:#c6cbb9;font-size:11px;flex-wrap:wrap}#first-light-game .fl-savebar button{padding:3px 7px;min-height:32px;background:transparent;color:inherit;border:1px solid #586650;border-radius:4px;font-size:11px}#first-light-game .fl-savebar[data-status="error"]{background:#573f2e;color:#fff0d3}#first-light-game .fl-sheet button:disabled{cursor:not-allowed}#first-light-game .fl-radio:disabled{opacity:.7}#first-light-game .fl-loading{padding:25px 0;text-align:center;color:#bac4af}#first-light-game .fl-gate-alert{color:#8c452b}#first-light-game .fl-offline-note{font-size:12px;color:#e4c796}#first-light-game .fl-shortage{padding:8px;background:#e1c5a4;color:#653c29}#first-light-game .fl-cost{margin-top:8px;color:#64694f;font-size:12px}#first-light-game .fl-story{font-family:"Songti SC",serif}#first-light-game .fl-scene button:disabled{opacity:.65}#first-light-game .fl-savebar[hidden]{display:none} @media(max-width:480px){#first-light-game{padding:0}#first-light-game .fl-phone{border-radius:0;border:0;min-height:100dvh}#first-light-game .fl-header{padding-top:max(18px,env(safe-area-inset-top))}#first-light-game .fl-footer{padding-bottom:max(10px,env(safe-area-inset-bottom))}}

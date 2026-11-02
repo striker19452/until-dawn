@@ -1,0 +1,82 @@
+[
+  {
+    "asset": "yard-day-hd-v4",
+    "original": 3875685,
+    "web": 733560,
+    "width": 1122,
+    "height": 1402,
+    "alphaExact": true
+  },
+  {
+    "asset": "yard-night-hd-v4",
+    "original": 3088759,
+    "web": 472270,
+    "width": 1122,
+    "height": 1402,
+    "alphaExact": true
+  },
+  {
+    "asset": "survivors-walk-a-v4",
+    "original": 1519688,
+    "web": 419576,
+    "width": 1254,
+    "height": 1254,
+    "alphaExact": true
+  },
+  {
+    "asset": "survivors-walk-b-v4",
+    "original": 1652835,
+    "web": 437756,
+    "width": 1254,
+    "height": 1254,
+    "alphaExact": true
+  },
+  {
+    "asset": "creatures-walk-a-v4",
+    "original": 924083,
+    "web": 277824,
+    "width": 1448,
+    "height": 1086,
+    "alphaExact": true
+  },
+  {
+    "asset": "creatures-walk-b-v4",
+    "original": 1064730,
+    "web": 309964,
+    "width": 1448,
+    "height": 1086,
+    "alphaExact": true
+  },
+  {
+    "asset": "buildings-v3",
+    "original": 929450,
+    "web": 237562,
+    "width": 1774,
+    "height": 887,
+    "alphaExact": true
+  },
+  {
+    "asset": "props-v3",
+    "original": 805931,
+    "web": 208784,
+    "width": 1254,
+    "height": 1254,
+    "alphaExact": true
+  },
+  {
+    "asset": "survivors-portraits-v1",
+    "original": 1088056,
+    "web": 232030,
+    "width": 1774,
+    "height": 887,
+    "alphaExact": true
+  },
+  {
+    "asset": "paper-wasteland-v1",
+    "original": 3168333,
+    "web": 124304,
+    "width": 680,
+    "height": 680,
+    "alphaExact": true
+  }
+]

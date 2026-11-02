@@ -1,0 +1,52 @@
+import {openTab} from './support/ui.js';
+import { test, expect } from '@playwright/test';
+import { initialCampaign, applyCampaignAction } from '../src/campaign.js';
+
+test('Meng cooking is exclusive, explains its costs, and updates dusk food demand after replanning',async({page})=>{
+ let state=applyCampaignAction(initialCampaign(314),{type:'chooseRole',role:'repairman'}),revision=0;
+ const act=action=>{state=applyCampaignAction(state,action);revision++;};
+ state.day=13;state.ap=40;state.resources.materials=100;
+ act({type:'beds'});act({type:'beds'});
+ for(const person of ['lin','zhou','chen','meng'])act({type:'recruit',person});
+ // Serve an isolated day-13 fixture; mutations still execute the actual campaign rules.
+ await page.route('**/api/campaign',route=>route.fulfill({json:{state,runId:'cooking-ui',revision}}));
+ await page.route('**/api/campaign/action',route=>{
+  act(route.request().postDataJSON().action);
+  return route.fulfill({json:{state,runId:'cooking-ui',revision}});
+ });
+ await page.goto('/');await expect(page.locator('#phase')).toHaveText('白天经营');
+ await openTab(page,'members');
+ await page.locator('[data-action=member-view][data-person=meng]').click();
+ await page.locator('[data-action=subtab][data-group=member][data-value=work]').click();
+ const jobs=page.locator('[data-change=job]');
+ await expect(jobs.locator('option[value=cook]')).toHaveAttribute('disabled','');
+ await expect(page.locator('#sheet-body')).toContainText('全员夜末额外恐惧−2');
+ await page.locator('[data-action=member-view][data-person=lin]').click();
+ await expect(jobs.locator('option[value=cook]')).toHaveCount(0);
+ await page.locator('[data-action=close-overlay]').click();
+ await page.locator('[data-action=drawer][data-panel=build]').click();
+ await page.locator('[data-action=facility][data-building=stove]').click();
+ await page.locator('[data-action=build][data-building=stove]').click();
+ await page.locator('[data-action=close-overlay]').click();
+ await openTab(page,'members');
+ await page.locator('[data-action=member-view][data-person=meng]').click();
+ await jobs.selectOption('cook');await expect(jobs).toHaveValue('cook');
+ await expect(page.getByTestId('day-work-guide')).toContainText('每人少耗1食物');await expect(page.getByTestId('day-work-guide')).toContainText('疲劳+10');
+ await page.locator('[data-action=close-overlay]').click();
+ await page.getByRole('button',{name:'食物：查看每日消耗'}).click();
+ await expect(page.getByTestId('daily-consumption')).toContainText('食物每日消耗 6');
+ await expect(page.getByTestId('daily-consumption').locator('div').filter({has:page.locator('dt', {hasText:'孟姐掌灶节省（每人1）'})})).toContainText('−5食物');
+ expect(await page.locator('#sheet-body').evaluate(el=>el.scrollWidth<=el.clientWidth)).toBe(true);
+ await page.screenshot({path:'.local/cooking-farming/cooking-rations.png',fullPage:true});
+ await page.locator('[data-action=close-overlay]').click();
+ await page.locator('[data-action=prepare]').click();
+ await openTab(page,'ready');
+ await expect(page.locator('#sheet-body')).toContainText('需要6食物');
+ await expect(page.locator('#sheet-body')).toContainText('孟姐掌灶');
+ await page.locator('[data-action=back-day]').click();await expect(page.locator('#phase')).toHaveText('白天经营');
+ await openTab(page,'members');
+ await jobs.selectOption('rest');await page.locator('[data-action=close-overlay]').click();
+ await page.locator('[data-action=prepare]').click();
+ await openTab(page,'ready');
+ await expect(page.locator('#sheet-body')).toContainText('需要10食物');
+});

@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#202c2a"><meta name="description" content="经营一座小院，与幸存者一起撑过末日。手机竖屏生存策略游戏，第1天可玩版。"><title>等到天亮 · 第28天</title><link rel="icon" href="data:,"><link rel="stylesheet" href="/styles.css"><script type="module" src="/app.js"></script></head><body>
+<div id="first-light-game">
+  <main class="fl-phone" aria-label="等到天亮，第1天可玩版">
+    <header class="fl-header"><div><span class="fl-kicker">一座小院 · 五个人 · 二十八天</span><h1>等到天亮<span>第 28 天</span></h1></div><span class="fl-edition">第 1 天</span></header>
+    <div class="fl-savebar" id="fl-savebar" role="status" aria-live="polite"><span id="fl-save-status">正在读取你的存档…</span><div id="fl-save-actions"></div></div>
+    <div class="fl-day"><div><i data-lucide="sun" aria-hidden="true"></i><strong id="fl-date">第 1 天 · 清晨</strong></div><span id="fl-ap">行动 6 / 6</span></div>
+    <div class="fl-resources" aria-label="院子资源" id="fl-resources"></div>
+    <button class="fl-radio cursor-interaction" data-do="radio"><i data-lucide="radio" aria-hidden="true"></i><span id="fl-radio-text">有一段微弱的广播。听听看。</span><span aria-hidden="true">›</span></button>
+    <section class="fl-scene" aria-label="可点选建筑的院子">
+      <canvas id="fl-yard" role="img" aria-label="手绘小院：房屋、菜畦、工作台和围墙；暖灯亮在屋檐下。"></canvas>
+      <div class="fl-scene-note" id="fl-scene-note">一盏灯，还亮着。</div>
+      <button class="fl-place fl-home cursor-interaction" data-do="home">小屋 <span>2 个床位</span></button>
+      <button class="fl-place fl-garden cursor-interaction" data-do="garden">空地 <span>可开垦</span></button>
+      <button class="fl-place fl-workbench cursor-interaction" data-do="workbench">工作台 <span>简易制作</span></button>
+      <button class="fl-place fl-gate cursor-interaction" data-do="gate">院门 <span id="fl-gate-label">30 / 100</span></button>
+      <button class="fl-visitor cursor-interaction" data-do="visitor" hidden>门外有人敲门</button>
+    </section>
+    <div class="fl-message" id="fl-message" role="status" aria-live="polite">不用赶时间。先听广播，再想想今天要做什么。</div>
+    <section class="fl-sheet" id="fl-sheet" aria-label="当前操作"><p class="fl-loading">正在打开你的院子…</p></section>
+    <div class="fl-primary-area" id="fl-primary-area"></div>
+    <nav class="fl-nav" aria-label="游戏导航">
+      <button data-do="yard" class="cursor-interaction" aria-current="page"><i data-lucide="house" aria-hidden="true"></i>院子</button>
+      <button data-do="members" class="cursor-interaction"><i data-lucide="users" aria-hidden="true"></i>成员 <span id="fl-crew">1/5</span></button>
+      <button data-do="explore" class="cursor-interaction"><i data-lucide="footprints" aria-hidden="true"></i>外出</button>
+      <button data-do="journal" class="cursor-interaction"><i data-lucide="notebook-pen" aria-hidden="true"></i>日志</button>
+    </nav>
+    <div class="fl-footer">离开时暂停 · 随时可以慢慢想</div>
+  </main>
+</div>
+
+<noscript>这个游戏需要启用 JavaScript，进度会自动保存。</noscript>
+</body></html>

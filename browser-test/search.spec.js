@@ -1,0 +1,122 @@
+import {openTab,openReady} from './support/ui.js';
+import {test,expect} from '@playwright/test';
+import {initialCampaign,applyCampaignAction as act,makePerson} from '../src/campaign.js';
+import {SITES,weather} from '../src/content.js';
+import {searchPlan,searchInjury} from '../src/search.js';
+
+async function fixture(page,{day=10,rank=0,exposure=0}={}){
+ let state=act(initialCampaign(53),{type:'chooseRole',role:'repairman'}),revision=1;
+ state.day=day;state.exposure=exposure;
+ state.people.push(makePerson('yuan','阿远','快递员','exploration'));
+ state.people[1].skills.exploration=rank;state.people[1].fatigue=30;
+ await page.route('**/api/campaign',route=>route.fulfill({json:{state,runId:'search-ui',revision}}));
+ await page.route('**/api/campaign/action',route=>{state=act(state,route.request().postDataJSON().action);return route.fulfill({json:{state,runId:'search-ui',revision:++revision}});});
+ await page.goto('/');await expect(page.locator('#world')).toHaveAttribute('data-ready','true');
+ await openTab(page,'explore');
+ return ()=>state;
+}
+
+for(const width of [320,390,1280])test(`search ${width}: live escort previews, confirmation, actual loot and single dusk fatigue agree`,async({page})=>{
+ await page.setViewportSize({width,height:width===320?568:844});
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));const state=await fixture(page);
+ await page.locator('#site-view').selectOption('shed');
+ await expect(page.getByTestId('search-quick')).toContainText('建材 7、零件 1、燃料 1');
+ await expect(page.getByTestId('search-deep')).toContainText('建材 14、零件 2、燃料 2');
+ await expect(page.getByTestId('search-deep')).toContainText('擦伤概率20%，主角承担健康−12');
+ await page.locator('#escort').selectOption('yuan');
+ await expect(page.getByTestId('search-quick')).toContainText('建材 9、零件 2、燃料 2');
+ await expect(page.getByTestId('search-deep')).toContainText('建材 16、零件 3、燃料 3');
+ await expect(page.getByTestId('search-deep')).toContainText('擦伤概率10%，阿远承担健康−8');
+ await expect(page.getByTestId('escort-cost')).toContainText('疲劳+10');
+ await page.locator('#site-view').selectOption('alley');await expect(page.locator('#escort')).toHaveValue('yuan');
+ await expect(page.getByTestId('search-deep')).toContainText('食物 10、净水 5、建材 4');
+ await page.locator('#site-view').selectOption('shed');
+ let prompt='';page.once('dialog',async dialog=>{prompt=dialog.message();await dialog.dismiss();});
+ const before=structuredClone(state());await page.locator('[data-action=deep]').click();
+ expect(prompt).toContain('建材 16、零件 3、燃料 3');expect(prompt).toContain('擦伤概率10%');
+ expect(prompt).toContain('阿远疲劳+10');expect(state()).toEqual(before);
+ await page.screenshot({path:`.local/validation/search/preview-${width}.png`,fullPage:true});
+ page.once('dialog',dialog=>dialog.accept());await page.locator('[data-action=deep]').click();
+ await expect(page.locator('#escort option[value=yuan]')).toHaveCount(0);
+ expect(state().resources.materials-before.resources.materials).toBe(16);
+ expect(state().resources.parts-before.resources.parts).toBe(3);
+ expect(state().resources.fuel-before.resources.fuel).toBe(3);
+ expect(state().people[1].fatigue).toBe(40);expect(state().people[1].job).toBe('escort');
+ await page.locator('[data-action=close-overlay]').click();await page.locator('[data-action=prepare]').click();
+ await expect(page.locator('#phase')).toHaveText('黄昏准备');
+ expect(state().people[1].fatigue).toBe(40);expect(state().people[1].job).toBe('rest');
+ await openReady(page);await page.locator('[data-action=back-day]').click();
+ await expect(page.locator('#phase')).toHaveText('白天经营');expect(state().people[1].fatigue).toBe(40);
+ expect(state().people[1].job).toBe('escort');await expect(page.locator('#overlay')).toBeHidden();
+ await page.locator('[data-action=prepare]').click();await expect(page.locator('#phase')).toHaveText('黄昏准备');
+ expect(state().people[1].fatigue).toBe(40);
+ const layout=await page.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth}));
+ expect(layout.scroll).toBeLessThanOrEqual(layout.width);expect(errors).toEqual([]);
+});
+
+test('skilled escort and first-day safety are reflected in both preview and confirmation, including the exposure cap',async({page})=>{
+ await fixture(page,{day:1,rank:2,exposure:6});
+ await page.locator('#site-view').selectOption('shed');await page.locator('#escort').selectOption('yuan');
+ await expect(page.getByTestId('search-deep')).toContainText('建材 17、零件 3、燃料 3');
+ await expect(page.getByTestId('search-deep')).toContainText('无擦伤风险；暴露+0（已达上限）');
+ page.once('dialog',async dialog=>{expect(dialog.message()).toContain('无擦伤风险');expect(dialog.message()).toContain('暴露+0');await dialog.dismiss();});
+ await page.locator('[data-action=deep]').click();
+ await page.reload();await openTab(page,'explore');await page.locator('#escort').selectOption('yuan');
+ await page.locator('[data-action=close-overlay]').click();await openTab(page,'members');
+ await page.locator('[data-action=member-view][data-person=yuan]').click();
+ await page.getByRole('button',{name:'技能说明 · 查看各级收益'}).click();
+ await page.locator('[data-group=skill][data-value=exploration]').click();
+ await expect(page.getByTestId('skill-current')).toContainText('主要物资+3、其他各+1；深搜擦伤5%、健康−8');
+});
+
+for(const [width,rank,deepChance] of [[320,0,40],[390,2,35]])test(`fog outing ${width}: quick risk, deep confirmation and actual injury match the weather`,async({page})=>{
+ await page.setViewportSize({width,height:width===320?568:844});
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ const state=await fixture(page,{day:14,rank});await page.locator('#site-view').selectOption('shed');
+ expect(weather(state().day,state().seed)).toBe('fog');
+ await expect(page.getByTestId('search-quick')).toContainText('雾天出行风险增加；擦伤概率30%，主角承担健康−12');
+ await expect(page.getByTestId('search-deep')).toContainText('擦伤概率50%，主角承担健康−12');
+ await page.locator('#escort').selectOption('yuan');
+ await expect(page.getByTestId('search-quick')).toContainText('擦伤概率30%，阿远承担健康−8');
+ await expect(page.getByTestId('search-deep')).toContainText(`擦伤概率${deepChance}%，阿远承担健康−8`);
+ let prompt='';page.once('dialog',async dialog=>{prompt=dialog.message();await dialog.dismiss();});
+ const before=structuredClone(state());await page.locator('[data-action=deep]').click();
+ expect(prompt).toContain('雾天出行风险增加');expect(prompt).toContain(`擦伤概率${deepChance}%`);expect(state()).toEqual(before);
+ expect(await page.locator('#sheet-body').evaluate(el=>el.scrollWidth<=el.clientWidth)).toBe(true);
+ await page.screenshot({path:`.local/fog-search/preview-${width}.png`,fullPage:true});
+ const plan=searchPlan(SITES.shed,{escort:before.people[1],day:before.day,weather:'fog'}),injured=searchInjury(before.seed,before.day,'shed',plan);
+ await page.locator('[data-action=search][data-site=shed]').click();
+ await expect(page.locator('#escort option[value=yuan]')).toHaveCount(0);
+ expect(state().people[1].health).toBe(before.people[1].health-(injured?8:0));expect(state().people[0].health).toBe(before.people[0].health);
+ expect(state().resources.materials-before.resources.materials).toBe(plan.loot.materials);expect(errors).toEqual([]);
+});
+
+test('real server saves the new loot and single fatigue, and a repeated search request cannot pay or reward twice',async({page})=>{
+ await page.goto('/');await page.getByRole('button',{name:/修理工/}).click();
+ await expect(page.locator('#phase')).toHaveText('白天经营');
+ await expect(page.locator('#world')).toHaveAttribute('data-ready','true');
+ await openTab(page,'members');
+ await page.locator('[data-action=member-view][data-person=visitors]').click();
+ await page.locator('[data-action=recruit][data-person=lin]').click();
+ await page.locator('[data-action=close-overlay]').click();
+ await openTab(page,'explore');
+ await page.locator('#site-view').selectOption('shed');await page.locator('#escort').selectOption('lin');
+ const before=await page.request.get('/api/campaign').then(r=>r.json());
+ const sent=page.waitForRequest(req=>req.url().endsWith('/api/campaign/action')&&req.postDataJSON()?.action.type==='search');
+ page.once('dialog',dialog=>dialog.accept());await page.locator('[data-action=deep]').click();
+ const request=(await sent).postDataJSON();await expect(page.locator('#escort option[value=lin]')).toHaveCount(0);
+ const saved=await page.request.get('/api/campaign').then(r=>r.json());
+ expect(saved.state.resources.materials-before.state.resources.materials).toBe(16);
+ expect(saved.state.resources.parts-before.state.resources.parts).toBe(3);
+ expect(saved.state.resources.fuel-before.state.resources.fuel).toBe(3);
+ expect(saved.state.people.find(p=>p.id==='lin').fatigue).toBe(10);
+ const replay=await page.request.post('/api/campaign/action',{data:request});expect(replay.ok()).toBe(true);
+ const replayed=await replay.json();expect(replayed.replayed).toBe(true);
+ expect(replayed.runId).toBe(saved.runId);expect(replayed.revision).toBe(saved.revision);expect(replayed.state).toEqual(saved.state);
+ await page.locator('[data-action=close-overlay]').click();await page.locator('[data-action=prepare]').click();
+ await expect(page.locator('#phase')).toHaveText('黄昏准备');await page.reload();
+ await expect(page.locator('#phase')).toHaveText('黄昏准备');
+ const ready=await page.request.get('/api/campaign').then(r=>r.json());
+ expect(ready.state.people.find(p=>p.id==='lin').fatigue).toBe(10);
+ expect(ready.state.resources).toEqual(saved.state.resources);
+});
