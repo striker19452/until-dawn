@@ -10,7 +10,7 @@ import { RuleError } from './src/campaign.js';
 import { openCampaignStore } from './src/campaign-store.js';
 
 const projectRoot = dirname(fileURLToPath(import.meta.url));
-const MIME = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.png':'image/png', '.webp':'image/webp', '.svg':'image/svg+xml', '.mp3':'audio/mpeg', '.ogg':'audio/ogg', '.wav':'audio/wav' };
+const MIME = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.png':'image/png', '.webp':'image/webp', '.svg':'image/svg+xml', '.mp3':'audio/mpeg', '.ogg':'audio/ogg', '.wav':'audio/wav', '.mp4':'video/mp4' };
 const STATIC = new Set(['/', '/index.html', '/legacy.html', '/app.js', '/styles.css', '/scene.js', '/icons.js']);
 function cookieToken(req) { return req.headers.cookie?.split(';').map(x => x.trim()).find(x => x.startsWith('dawn_session='))?.slice('dawn_session='.length); }
 function sendJSON(res, status, body) { res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' }); res.end(JSON.stringify(body)); }
@@ -47,7 +47,7 @@ export function createGameServer({ dbPath = process.env.DB_PATH || resolve(proje
   const server = http.createServer(async (req, res) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('Referrer-Policy', 'same-origin');
-    res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'none'; form-action 'self'");
+    res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self' blob:; connect-src 'self'; frame-ancestors 'self'; base-uri 'none'; form-action 'self'");
     try {
       const pathname = new URL(req.url, 'http://localhost').pathname;
       if (pathname === '/api/health' && req.method === 'GET') { sendJSON(res, 200, { ok: true, nightRuntime: 'client' }); return; }

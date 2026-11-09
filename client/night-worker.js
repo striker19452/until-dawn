@@ -15,6 +15,6 @@ self.addEventListener('message',({data})=>{
    if(!night)throw Error('本地夜战尚未就绪。');
    night.command(data.action,data.commandId);schedule();
   }else if(data.type==='dispose'){if(timer)clearInterval(timer);timer=null;night=null;}
- }catch(error){emit({type:'error',message:error.message});}
+ }catch(error){emit({type:'error',message:error.message,commandId:data.commandId});}
 });
 emit({type:'ready'});

@@ -31,15 +31,35 @@ test('patrol, explicit guard and stationary move orders share the inclusive 50-d
  }
 });
 
-test('a real ordinary strike stuns every ordinary species and a brood offspring for 0.15 seconds',()=>{
- for(const type of ['walker','climber','rammer','caller','burrower','quencher','broodmother']){
-  const {b,p}=fixture();const e=enemy(type,{x:p.x+40,y:p.y,...(type==='broodmother'?{bossBrood:true}:{}),progress:1});b.enemies=[e];
-  const stamina=p.stamina;stepBattle(b);assert.equal(e.stun,.15,type);assert.ok(e.hp<e.max);assert.equal(p.stamina,stamina-7);assert.equal(p.cooldown,1.8);assert.equal(b.work.hero,2);assert.equal(e.progress,0);
-  p.nightRole='sleep';const attack=e.attack;stepBattle(b);stepBattle(b);assert.equal(e.attack,attack,type);stepBattle(b);assert.equal(e.stun,0,type);assert.ok(e.attack>attack,type);
+test('ordinary strikes preserve windup and only stun ordinary species and brood offspring for 0.5 seconds',()=>{
+ for(const type of ['walker','skitter','climber','rammer','caller','burrower','quencher','bladebeast','shellcrab','sporetoad','echomantis','broodmother']){
+  const {b,p}=fixture();const e=enemy(type,{x:p.x+40,y:p.y,hp:1000,max:1000,...(type==='broodmother'?{bossBrood:true}:{}),progress:1});b.enemies=[e];
+  const stamina=p.stamina;stepBattle(b);assert.equal(e.stun,.5,type);assert.ok(e.hp<e.max);assert.equal(p.stamina,stamina-7);assert.equal(p.cooldown,1.8);assert.equal(b.work.hero,2);
+  const windsUp=['climber','caller','burrower','quencher','bladebeast','sporetoad'].includes(type);assert.equal(e.progress,windsUp?1.05:1,type);
+  p.nightRole='sleep';const attack=e.attack,progress=e.progress;for(let tick=0;tick<9;tick++)stepBattle(b);assert.equal(e.attack,attack,type);assert.equal(e.progress,progress,type);
+  stepBattle(b);assert.equal(e.stun,0,type);assert.ok(e.attack>attack,type);assert.equal(e.progress,windsUp?progress+.05:progress,type);
  }
 });
 
-test('ordinary strikes preserve a longer trap stun rather than reducing it to 0.15 seconds',()=>{
+test('a caller completes its accumulated windup despite repeated ordinary attacks',()=>{
+ const {b,p}=fixture(),e=enemy('caller',{x:p.x+40,y:p.y,hp:1000,max:1000,progress:1});b.enemies=[e];
+ for(let i=0;i<70&&!e.called;i++)stepBattle(b);
+ assert.ok(b.events.filter(v=>v.type==='attack'&&v.enemyId===e.id).length>=2);assert.equal(e.called,true);assert.equal(b.reinforcements,1);
+});
+
+test('throwing and triggered traps reset ordinary windups and attack timers',()=>{
+ for(const type of ['climber','rammer','caller','burrower','quencher','bladebeast','sporetoad'])for(const counter of ['throw','trap']){
+  const {b,p}=fixture(),e=enemy(type,{progress:1,attack:1});p.nightRole='sleep';b.enemies=[e];
+  if(counter==='throw'){
+   battleCommand(b,{type:'throw',person:p.id,target:'gate'});b.people[0].task.stage='work';b.people[0].task.progress=100;
+  }else{b.zones[0].traps=1;e.mode='approach';}
+  stepBattle(b);const actual=b.enemies.find(v=>v.id===e.id);
+  assert.equal(actual.progress,0,`${type} ${counter}`);assert.equal(actual.attack,0,`${type} ${counter}`);assert.equal(actual.stun,2,`${type} ${counter}`);
+  assert.ok(b.events.some(v=>v.type===counter));if(counter==='trap')assert.equal(b.zones[0].traps,0);
+ }
+});
+
+test('ordinary strikes preserve a longer trap stun rather than reducing it to 0.5 seconds',()=>{
  const {b,p}=fixture();const e=enemy('walker',{x:p.x+40,y:p.y,stun:2});b.enemies=[e];stepBattle(b);
  assert.equal(e.stun,1.95);assert.equal(e.hp,ENEMIES.walker.hp-13);
 });
@@ -72,6 +92,6 @@ test('a real throw and a real trap still interrupt and stun a boss, surviving a 
  }
 });
 
-test('guard skill help exposes the actual range, short stun and boss immunity',()=>{
- const {p}=fixture(),info=skillInfo(p,'guard');assert.match(info.note,/攻击距离50/);assert.match(info.note,/0\.15秒/);assert.match(info.note,/首领及双脉分裂体免疫/);assert.match(info.note,/投掷、陷阱/);
+test('guard skill help exposes the actual range, short stun, preserved windup and boss immunity',()=>{
+ const {p}=fixture(),info=skillInfo(p,'guard');assert.match(info.note,/攻击距离50/);assert.match(info.note,/0\.5秒/);assert.match(info.note,/不削减蓄力进度/);assert.match(info.note,/首领及双脉分裂体免疫/);assert.match(info.note,/重击、陷阱/);
 });

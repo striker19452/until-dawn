@@ -14,7 +14,7 @@ export function bossDamage(b,e,raw,source){
  if(!e.boss||b.boss?.id!==e.type)return raw;
  const phase=b.boss.phase;
  if(phase==='exposed')return raw*B.exposedFactor;
- if(source==='strike'||source==='throw'){
+ if(source==='strike'||source==='throw'||source==='heavy'){
   if(e.type==='bastion'&&phase==='charge')return raw*B.bastion.armor;
   if(e.type==='cinderwhale'&&phase==='siphon')return raw*B.cinder.armor;
  }
@@ -26,8 +26,8 @@ function seal(b,m,h){const bs=b.boss,e=body(b);if(!e||e.hp<=0)return;m.sealed=tr
 export function bossCounter(b,type,zone,h){const bs=b.boss;if(!bs||bs.defeated)return;
  if(type==='throw'||type==='compact')for(const m of bs.mounds)if(!m.sealed&&m.zone===zone)seal(b,m,h);
  const e=body(b);if(!e||e.hp<=0||e.zone!==zone)return;
- if(bs.id==='bastion'&&(type==='trap'||type==='throw')&&bs.phase!=='exposed')expose(b,e,h,B.bastion.afterCounter,type==='trap'?'陷阱绊倒':'投掷打断');
- if(bs.id==='cinderwhale'&&type==='throw'&&bs.phase==='siphon')expose(b,e,h,B.cinder.afterCounter,'吸焰被打断');
+ if(bs.id==='bastion'&&(type==='trap'||type==='throw'||type==='heavy')&&bs.phase!=='exposed')expose(b,e,h,B.bastion.afterCounter,type==='trap'?'陷阱绊倒':type==='heavy'?'重击打断':'投掷打断');
+ if(bs.id==='cinderwhale'&&(type==='throw'||type==='heavy')&&bs.phase==='siphon')expose(b,e,h,B.cinder.afterCounter,'吸焰被打断');
 }
 export function stepBossEnemy(b,e,dt,h){
  const bs=b.boss;if(!e.boss||!bs||bs.id!==e.type)return false;
@@ -41,8 +41,6 @@ export function stepBossEnemy(b,e,dt,h){
   if(bs.clock+1e-8>=B.bastion.charge){emit(b,h,'boss-impact',e,'棘冠冲撞',{target:ZONES.find(z=>z.id===e.zone)});if(h.braced(b,e.zone)){h.finishBrace(b,e.zone);expose(b,e,h,B.bastion.afterCounter,'顶住成功');}else{h.hitZone(b,z,def.damage,e);expose(b,e,h,B.bastion.afterHit,'撞后失衡');}}
  }else if(e.type==='broodmother'){
   bs.phase='nesting';e.attack+=dt;if(e.attack>=def.interval){e.attack=0;h.hitZone(b,z,def.damage,e);}
-  if(bs.mounds.length===0&&bs.summons<B.brood.limit&&b.elapsed>=bs.nextMound){const zone=bs.moundSeq++%2?'backRight':'backLeft',p=ZONES.find(z=>z.id===zone);bs.mounds.push({id:bs.moundSeq,zone,left:B.brood.hatch,sealed:false});bs.nextMound=b.elapsed+B.brood.interval;
-   h.event(b,'boss-mound',p.x,p.y,`地下鼓包 · ${B.brood.hatch}秒孵化`,{zone,bossId:bs.id});h.note(b,`${p.name}出现发光鼓包，${B.brood.hatch}秒内压实或投掷封巢；埋网会自动封住。`);h.alarm(b,'穴灯巢母正在孵化：留意后栏鼓包倒计时。','boss-broodmother');}
  }else if(e.type==='cinderwhale'){
   const fire=b.fires.find(f=>f.id==='central'),lit=fire&&fire.heat>0&&fire.enabled!==false;
   if(bs.phase==='exposed')return true;
@@ -58,8 +56,11 @@ export function stepBossEnemy(b,e,dt,h){
 }
 export function stepBossWorld(b,dt,h){const bs=b.boss;if(!bs||bs.defeated)return;const e=body(b);if(!e||e.hp<=0)return;
  if(bs.phase==='exposed'){bs.clock=Math.max(0,bs.clock-dt);if(bs.clock===0)bs.phase='rest';}
+ // Laying follows the living mother, including approach, stun and inside combat.
+ if(bs.id==='broodmother'&&bs.mounds.length===0&&b.elapsed+1e-8>=bs.nextMound){const zone=bs.moundSeq++%2?'backRight':'backLeft',p=ZONES.find(z=>z.id===zone);bs.mounds.push({id:bs.moundSeq,zone,left:B.brood.hatch,sealed:false});bs.nextMound=b.elapsed+B.brood.interval;
+  h.event(b,'boss-mound',p.x,p.y,`地下鼓包 · ${B.brood.hatch}秒孵化`,{zone,bossId:bs.id});h.note(b,`${p.name}出现发光鼓包，${B.brood.hatch}秒内压实或投掷封巢；埋网会自动封住。`);h.alarm(b,'穴灯巢母正在孵化：留意后栏鼓包倒计时。','boss-broodmother');}
  for(const m of bs.mounds){if(m.sealed)continue;const zone=b.zones.find(z=>z.id===m.zone);if(zone.mesh||zone.compacted){seal(b,m,h);continue;}m.left=Math.max(0,m.left-dt);
-  if(m.left===0){m.sealed=true;bs.summons++;const hatch=h.spawn(b,'broodmother',m.zone,false,false,{bossBrood:true});Object.assign(hatch,{hp:BOSS_FORM_HEALTH.brood,max:BOSS_FORM_HEALTH.brood,mode:'inside',x:ZONES.find(z=>z.id===m.zone).x,y:ZONES.find(z=>z.id===m.zone).y,bossBrood:true});h.note(b,`${ZONES.find(z=>z.id===m.zone).name}鼓包孵化，一只穴灯幼兽从地下入院（最多${B.brood.limit}只）。`);emit(b,h,'boss-hatch',hatch,'幼兽入院 · 优先驱赶');}
+  if(m.left===0){m.sealed=true;bs.summons++;const hatch=h.spawn(b,'broodmother',m.zone,false,false,{bossBrood:true});Object.assign(hatch,{hp:BOSS_FORM_HEALTH.brood,max:BOSS_FORM_HEALTH.brood,mode:'inside',x:ZONES.find(z=>z.id===m.zone).x,y:ZONES.find(z=>z.id===m.zone).y,bossBrood:true});h.note(b,`${ZONES.find(z=>z.id===m.zone).name}鼓包孵化，一只穴灯幼兽从地下入院；巢母存活时仍会继续产卵。`);emit(b,h,'boss-hatch',hatch,'幼兽入院 · 优先驱赶');}
  }bs.mounds=bs.mounds.filter(m=>!m.sealed);
 }
 export function finishBossStep(b,h){const bs=b.boss;if(!bs||bs.defeated)return;

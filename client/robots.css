@@ -1,0 +1,24 @@
+.robot-manufacture article{display:flex;gap:12px;padding:16px 0;border-bottom:1px solid var(--line,#665b43)}
+.robot-portrait{display:block;flex:0 0 72px;width:72px;height:78px;background-size:300% 100%;background-repeat:no-repeat}
+.robot-manufacture h4,.robot-heading h4{margin:0 0 6px;font-size:16px}
+.robot-manufacture p{margin:0 0 8px}
+.robot-heading{display:flex;align-items:center;gap:12px;margin:16px 0}
+.robot-heading .robot-portrait{flex-basis:86px;width:86px;height:86px}
+.robot-plan{border:1px solid var(--line,#665b43);border-radius:12px;margin:20px 0;padding:14px;min-width:0}
+.robot-plan legend{padding:0 6px;font-weight:600}
+.robot-route{list-style:none;padding:0;margin:0 0 12px}
+.robot-route li{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid var(--line,#665b43)}
+.robot-route li>div{display:flex;gap:6px}
+.robot-route .button{min-height:40px;padding:8px}
+.robot-route-add{display:flex;align-items:center;gap:8px}
+.robot-route-add label{flex:1;min-width:0}
+.robot-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:16px 0}
+.robot-fields label{font-size:13px}
+.robot-threshold-help{margin-top:5px;font-size:11px;line-height:1.6;color:var(--ink)}
+.robot-plan select{width:100%;min-height:44px}
+.robot-plan>.button{margin-right:10px}
+.robots-panel{font-variant-numeric:tabular-nums}
+.robots-panel h3{margin-top:24px}
+.robots-panel>h3:first-child{margin-top:0}
+.robot-plan:disabled{opacity:.65}
+@media(max-width:420px){.robot-manufacture article{gap:8px}.robot-portrait{flex-basis:60px;width:60px;height:70px}.robot-fields{grid-template-columns:1fr}.robot-route li{flex-wrap:wrap}}

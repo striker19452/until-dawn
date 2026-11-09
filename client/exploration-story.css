@@ -1,0 +1,38 @@
+.journey-summary{display:flex;align-items:center;gap:10px;margin:0 0 14px;padding:10px 0;border-bottom:1px solid var(--line)}
+.journey-summary p{flex:1;font-size:12px;line-height:1.6;color:var(--ink)}
+.journey-summary .button{flex-shrink:0;max-width:108px;min-height:44px;white-space:normal}
+.exploration-story{color:var(--ink);font-size:12px;line-height:1.8}
+.exploration-story>h2{font:500 21px/1.5 Georgia,"Songti SC",serif;margin:2px 0 10px;text-wrap:balance}
+.exploration-story>section{margin-top:24px}
+.exploration-story h3{font-size:16px;font-weight:600;margin:0 0 8px}
+.exploration-story h4{font-size:13px;font-weight:600;margin:0 0 6px}
+.exploration-story .journey-location{margin:2px 0 13px;font-size:11px}
+.journey-prose{font:15px/1.9 Georgia,"Songti SC",serif;max-width:65ch}
+.journey-choices{margin:14px 0 0}
+.journey-choices>section{padding:16px 0;border-top:1px solid var(--line)}
+.journey-choices p{margin-bottom:7px}
+.journey-choices .button{min-height:44px;margin-top:5px;max-width:100%;text-align:left;white-space:normal;line-height:1.6}
+.journey-reward,.journey-next{color:#596a42}
+.journey-empty{padding:16px 0}
+.journey-goals article{padding:13px 0 17px;border-bottom:1px solid var(--line)}
+.journey-goals article>p{margin-bottom:7px}
+.journey-goals .actions{display:flex;flex-wrap:wrap;gap:8px}
+.journey-goals .actions .button{min-height:44px;white-space:normal}
+.journey-unavailable{font-size:11px;color:#87533a}
+.journey-waiting ul,.journey-finished ul{padding:0;margin:0;list-style:none}
+.journey-waiting li,.journey-finished li{padding:10px 0;border-bottom:1px solid var(--line)}
+.journey-waiting span,.journey-finished span{display:block;font-size:11px}
+.journey-journal ol{padding:0;list-style:none;margin:0}
+.journey-journal li{display:grid;grid-template-columns:46px minmax(0,1fr);gap:10px;padding:11px 0;border-bottom:1px solid var(--line)}
+.journey-journal time{font-size:11px}
+.journey-journal p{overflow-wrap:anywhere}
+.relationship-panel{margin:15px 0 18px;padding:13px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.relationship-panel h3{display:flex;justify-content:space-between;gap:12px;font-size:14px;margin-bottom:7px}
+.relationship-panel h3 span{font-size:12px;font-weight:400;font-variant-numeric:tabular-nums}
+.relationship-panel p,.relationship-panel li{font-size:12px;line-height:1.8}
+.relationship-panel ul{padding-left:17px;margin-bottom:0}
+.night .journey-reward,.night .journey-next{color:#c7dcaf}
+.night .journey-unavailable{color:#efbd98}
+.ending-journeys{margin-top:24px}
+.ending-journeys h2{font:400 11px/1.5 -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;letter-spacing:1px;color:var(--ending-muted);margin:0 0 12px}
+.ending-journeys p{font-size:12px;line-height:1.8;margin:0 0 10px;color:#e8ddc7}

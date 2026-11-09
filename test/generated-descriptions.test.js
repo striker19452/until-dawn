@@ -107,7 +107,7 @@ test('edited throw damage, cost and time reach the battle, emergency help and cr
   assert.equal(help.cost,'3建材');assert.equal(help.time,'0.5秒');assert.match(help.effect,/基础19伤害、眩晕5秒/);
   battleCommand(b,{type:'throw',person:p.id,target:'gate'});assert.equal(b.resources.materials,before-3);advance(b,.6);
   assert.equal(b.enemies[0].hp,81);assert.ok(b.enemies[0].stun>4.8);
-  assert.ok(bestiaryEntries({flags:{seenTypes:['caller']}}).find(e=>e.id==='caller').counter.includes('19伤害、眩晕5秒'));
+  assert.ok(bestiaryEntries({flags:{seenTypes:['caller']}}).find(e=>e.id==='caller').counter.includes(`${COMBAT.heavy.damage}伤害、眩晕${COMBAT.heavy.stun}秒`));
  })));
 });
 

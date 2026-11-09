@@ -25,13 +25,13 @@ test('all ordinary species first strike at half the old windup and HUD tracks th
  }
 });
 
-test('climbing, digging, summoning and spraying complete at their new half-duration thresholds',()=>{
- for(const [type,seconds,event]of [['climber',6,'vault'],['burrower',7,'dig'],['caller',3.5,'call'],['quencher',4,'wet']]){
+test('climbing, digging, summoning and spraying complete at their configured thresholds',()=>{
+ for(const [type,seconds,event]of [['climber',6,'vault'],['burrower',3,'dig'],['caller',3.5,'call'],['quencher',4,'wet']]){
   const {b,e}=fixture(type);if(type==='quencher')b.fires=[{id:'central',x:240,y:390,wood:1,heat:80,wet:0}];
   advance(b,seconds-.05);assert.ok(!b.events.some(e=>e.type===event),type);stepBattle(b);
   assert.ok(b.events.some(e=>e.type===event),type);if(['climber','burrower'].includes(type))assert.equal(e.mode,'inside');
  }
- assert.deepEqual(ENEMY_WINDUP,{climb:6,dig:7,call:3.5,spray:4});
+ assert.deepEqual(ENEMY_WINDUP,{climb:6,dig:3,call:3.5,spray:4});
 });
 
 test('boss attacks keep their doubled values while twin health receives its additional 50 percent increase',()=>{

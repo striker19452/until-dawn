@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {tacticalNight} from './support/tactical-night.js';
 import { run } from './support/campaign-route.js';
 import {createTestSession} from '../src/test-mode.js';
 import {createBattle,stepBattle} from '../src/battle.js';
@@ -18,7 +19,7 @@ test('45 historical campaign policies converge and save cleanly under the increa
   assert.ok(Object.values(r.s.resources).every(n=>Number.isFinite(n)&&n>=0));
   for(const night of r.nights){assert.ok(Number.isFinite(night.elapsed)&&night.elapsed>0);if(night.house>0&&!night.heroDead){assert.equal(night.remaining,0,'a standing house finishes only after clearing all threats');assert.equal(night.pending,0,'future arrivals cannot be skipped');}}
   if(r.s.phase==='rescued'){assert.equal(r.s.day,28);assert.ok(r.s.house>0);assert.ok(r.s.people.filter(p=>!p.dead).length>=1&&r.s.people.filter(p=>!p.dead).length<=size);}
-  else assert.ok(r.s.house===0||r.s.people[0].dead,'failure must have a real loss condition');
+  else assert.ok(r.s.house===0||r.s.people[0].dead||r.s.report.challenge.required&&r.s.report.challenge.status==='missed','failure must have a real loss or missed required objective');
   outcomes.push({role,size,seed,day:r.s.day,phase:r.s.phase});
  }
  assert.ok(outcomes.some(r=>r.phase==='failed'),'the old policies must reveal the stronger pressure');
@@ -28,19 +29,16 @@ test('an old solo policy without fire resolves an actual loss and remains determ
  const r=route('repairman',1,53,{fire:false}),again=run('repairman',1,53,{fire:false});
  // Denser early waves can break this old policy before the first boss. Check
  // the actual loss and contiguous, reproducible nights rather than a fixed day.
- assert.equal(r.s.phase,'failed');assert.ok(r.s.house===0||r.s.people[0].dead);assert.equal(r.nights.length,r.s.day);assert.deepEqual(r.nights.map(n=>n.day),Array.from({length:r.s.day},(_,i)=>i+1));assert.deepEqual(r.nights,again.nights);assert.deepEqual(r.failures,again.failures);
+ assert.equal(r.s.phase,'failed');assert.ok(r.s.house===0||r.s.people[0].dead||r.s.report.challenge.status==='missed');assert.equal(r.nights.length,r.s.day);assert.deepEqual(r.nights.map(n=>n.day),Array.from({length:r.s.day},(_,i)=>i+1));assert.deepEqual(r.nights,again.nights);assert.deepEqual(r.failures,again.failures);
 });
-test('manual orders improve aggregate historical challenge clears under the new food pressure',()=>{
+test('reading the daily problem and issuing real orders beats a fixed gate stack',()=>{
  let activeClears=0,idleClears=0;
- for(const size of [1,3,5]){
-  const active=route('repairman',size,53),idle=route('repairman',size,53,{policy:'idle'});
-  const a=active.nights.filter(n=>n.cleared).length,i=idle.nights.filter(n=>n.cleared).length;
-  assert.ok(['rescued','failed'].includes(active.s.phase));assert.ok(['rescued','failed'].includes(idle.s.phase));
-  if(size===1)assert.ok(a>i,'a solo yard needs active direction');
-  activeClears+=a;idleClears+=i;
+ for(const day of [8,13,16,20,22,24])for(const seed of [11,53,97]){
+  const active=tacticalNight({day,seed}),idle=tacticalNight({day,seed,policy:'stacked'});
+  assert.ok(active.finished&&idle.finished);assert.equal(active.cleared,true,`D${day}/${seed}`);
+  activeClears+=Number(active.cleared);idleClears+=Number(idle.cleared);
  }
- // Clearing all enemies is now required; a timed retreat can no longer turn a live boss into a missed challenge.
- assert.ok(activeClears>idleClears,'manual direction must still improve real challenge outcomes');
+ assert.ok(activeClears>idleClears+8,'a gate stack cannot solve distinct daily objectives');
 });
 
 

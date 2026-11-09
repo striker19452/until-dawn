@@ -2,7 +2,7 @@ import {applyCampaignAction} from '../src/campaign.js';
 import {RESOURCE_NAMES,BUILDINGS} from '../src/content.js';
 import {resourceDifference} from '../src/resource-flow.js';
 
-const names={repairBuilding:'维修设施',rebuildBuilding:'原址重建',demolish:'拆除／清理',event:'事件选择',search:'外出搜索',upgradeBuilding:'升级设施',defense:'安装防御',repair:'修补围栏',beds:'扩建床位',rest:'休整',treat:'治疗',firstAid:'急救',dismiss:'成员转移',assign:'安排工作',trade:'物资交换',routeWork:'清理路线',help:'邻里援助',houseRepair:'修补小屋',prepare:'黄昏生产'};
+const names={buildRobot:'制造机器人',restoreRobot:'修复机体',scrapRobot:'拆解机器人',explorationChoice:'回应见闻',explorationGoal:'履行约定',repairBuilding:'维修设施',rebuildBuilding:'原址重建',demolish:'拆除／清理',event:'事件选择',search:'外出搜索',upgradeBuilding:'升级设施',defense:'安装防御',repair:'修补围栏',beds:'扩建床位',rest:'休整',treat:'治疗',firstAid:'急救',dismiss:'成员转移',assign:'安排工作',trade:'物资交换',routeWork:'清理路线',help:'邻里援助',houseRepair:'修补小屋',prepare:'黄昏生产'};
 const actionName=a=>a.type==='build'?`建设${BUILDINGS[a.building]?.name||'设施'}`:a.type==='craft'?({fuel:'加工燃料',medicine:'制作护理包',trap:'制作陷阱'}[a.item]||'加工物资'):names[a.type]||'白天操作';
 const clock=t=>`${String(Math.floor(t/60)).padStart(2,'0')}:${String(Math.floor(t%60)).padStart(2,'0')}`;
 const splitChanges=changes=>['spend','gain'].map(kind=>({kind,changes:changes.filter(c=>kind==='gain'?c.amount>0:c.amount<0)})).filter(flow=>flow.changes.length);

@@ -43,7 +43,7 @@ test('all four bosses must be defeated even beyond 150 seconds, including all th
   b.elapsed=180;stepBattle(b);assert.equal(b.finished,false);assert.equal(b.boss.defeated,false);assert.notEqual(b.enemies[0].mode,'retreat');
   b.enemies[0].hp=0;stepBattle(b);
   if(day===28){assert.equal(b.finished,false);assert.equal(nightProgress(b).remaining,3);b.enemies[0].hp=0;stepBattle(b);assert.equal(b.finished,false);b.enemies[1].hp=0;stepBattle(b);assert.equal(b.finished,false);assert.equal(b.boss.defeated,false);for(const e of b.enemies)e.hp=0;stepBattle(b);}
-  assert.equal(b.boss.defeated,true);assert.equal(b.finished,true);assert.equal(b.challenge.status,'cleared');
+  assert.equal(b.boss.defeated,true);assert.equal(b.finished,false);assert.equal(b.boss.followerReleased,true);assert.equal(b.schedule.length,1);for(let i=0;i<63;i++)stepBattle(b);assert.equal(b.finished,false);assert.ok(b.enemies.some(e=>!e.boss));for(const e of b.enemies)e.hp=0;stepBattle(b);assert.equal(b.finished,true);assert.equal(b.challenge.status,'cleared');
  }
 });
 

@@ -65,14 +65,19 @@ export function nearestWalkablePoint(p,map=DEFAULT_WALK_MAP,from=null){
  return point?(distance(point,artPoint(p))<EPS?{x:p.x,y:p.y}:worldPoint(point)):null;
 }
 
-export function moveToward(p,t,speed,dt,avoid=false,map=DEFAULT_WALK_MAP){
- if(!avoid){const d=distance(p,t);if(d>EPS)Object.assign(p,mix(p,t,Math.min(1,speed*dt/d)));return distance(p,t)<8;}
+function walkingRoute(p,t,map){
  let route=routes.get(p);
  if(!route||route.map!==map||route.tx!==t.x||route.ty!==t.y||route.x!==p.x||route.y!==p.y){
   const graph=graphFor(map),a=artPoint(p),start=nearestArt(a,map,graph),end=nearestArt(artPoint(t),map,graph,start);
-  if(!start||!end)return false;const planned=path(start,end,map,graph);if(!planned)return false;
-  route={map,tx:t.x,ty:t.y,goal:distance(end,artPoint(t))<EPS?{x:t.x,y:t.y}:worldPoint(end),points:distance(a,start)>EPS?[start,...planned]:planned,index:0};routes.set(p,route);
+  if(!start||!end)return null;const planned=path(start,end,map,graph);if(!planned)return null;
+  route={map,tx:t.x,ty:t.y,x:p.x,y:p.y,goal:distance(end,artPoint(t))<EPS?{x:t.x,y:t.y}:worldPoint(end),points:distance(a,start)>EPS?[start,...planned]:planned,index:0};routes.set(p,route);
  }
+ return route;
+}
+
+export function moveToward(p,t,speed,dt,avoid=false,map=DEFAULT_WALK_MAP){
+ if(!avoid){const d=distance(p,t);if(d>EPS)Object.assign(p,mix(p,t,Math.min(1,speed*dt/d)));return distance(p,t)<8;}
+ const route=walkingRoute(p,t,map);if(!route)return false;
  // Stop on a corner for this tick. Combining two legs would let render
  // interpolation cut diagonally through the obstacle between snapshots.
  if(route.index<route.points.length&&speed*dt>EPS){
@@ -80,4 +85,20 @@ export function moveToward(p,t,speed,dt,avoid=false,map=DEFAULT_WALK_MAP){
   Object.assign(p,fraction===1?world:worldPoint(mix(artPoint(p),target,fraction)));if(fraction===1)route.index++;
  }
  route.x=p.x;route.y=p.y;return distance(p,route.goal)<8;
+}
+
+// Use the movement ticks and stopping distance the worker will actually use.
+// An interaction range is measured to the real target, not its snapped point.
+export function walkTravelTime(from,target,speed,dt,limit,map=DEFAULT_WALK_MAP,range=null){
+ const p={x:from.x,y:from.y};
+ if(range!==null&&distance(p,target)<=range)return 0;
+ const route=walkingRoute(p,target,map);
+ if(!route)return Infinity;
+ const reached=()=>range===null?distance(p,route.goal)<8:distance(p,target)<=range;
+ if(reached())return 0;
+ for(let tick=1;tick*dt<=limit&&route.index<route.points.length;tick++){
+  moveToward(p,target,speed,dt,true,map);
+  if(reached())return tick*dt;
+ }
+ return Infinity;
 }

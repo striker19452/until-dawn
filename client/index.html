@@ -1,1 +1,25 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#243c32"><meta name="description" content="一个院子，一至五人，二十八个昼夜。白天经营，夜间实时守护。"><title>等到天亮 · 二十八日</title><script type="module" src="/main.js"></script></head><body><div id="app"><p class="loading">正在打开院子的门…</p></div><noscript>请启用JavaScript游玩。</noscript></body></html>
+<!doctype html>
+<html lang="zh-CN">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+ <meta name="theme-color" content="#243c32">
+ <meta name="description" content="一个院子，一至五人，二十八个昼夜。白天经营，夜间实时守护。">
+ <title>等到天亮 · 二十八日</title>
+ <script type="module" src="/startup-intro.js"></script>
+ <script type="module" src="/main.js"></script>
+</head>
+<body>
+ <div id="app"><p class="loading">正在打开院子的门…</p></div>
+ <dialog id="startup-intro" class="startup-intro" aria-label="AIYA工作室片头">
+  <div class="startup-intro-content">
+   <video muted playsinline aria-hidden="true"></video>
+   <div class="startup-intro-actions">
+    <button type="button" data-intro-sound disabled>有声重播</button>
+    <button type="button" data-intro-skip autofocus>跳过片头</button>
+   </div>
+  </div>
+ </dialog>
+ <noscript>请启用JavaScript游玩。</noscript>
+</body>
+</html>

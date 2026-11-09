@@ -1,0 +1,15 @@
+{
+  "src/battle.js": "8da3b2f2839f9d0d0dbba6c7c71ea9e10a2c796055b9faccf98e8ed4bc5aef73",
+  "src/campaign.js": "c244619955e11779aff3fbe55215dd9e75e07964e717da38c558b89fa7180c13",
+  "src/challenges.js": "baaf0061f172502366d9dee3da043256ef8f7846737f48206e567f8ffe11af81",
+  "src/content.js": "2aacf75d4dea40990a5df2cc1485f9543ff4693e71f08da98d22560ecb990eae",
+  "src/balance.js": "a9ee5195edf332767b7e0b9390d071886484f2a743573d7eb54f0dbe2354b676",
+  "src/fatigue.js": "f7b192283603488f75af4f17e31bc6b19070bd2f839dae4757c02c0f9f9dca35",
+  "src/night-orders.js": "55d08dbda1d4ba93df980c3c8dcdca18425920bcfc72d19b9817ca306d82929c",
+  "src/phase-creatures.js": "6823fad36013d979068d789407a4e3c47a647851ca59bb2d84eb9b42c9713f41",
+  "src/phase-creature-combat.js": "82479165638dd29355832a86bfc57979f57bd3b60def283fd2d6e74d6ddce7f8",
+  "src/cooperation.js": "7a3be691e64caeb2346163101edf4ba61b22ef886a246d190e98ea60c715cc77",
+  "src/client-result.js": "e36a28023778c0c1d2004cc36f1beccebac3cf5e634715f8a0df2ff7daafe3b0",
+  "test/support/tactical-night.js": "c5e2739fe8760110fca39945eacc45f5de77dee7526c5b26f21fe357ba36b687",
+  "scripts/audit-tactics.mjs": "9c160f9f1965e02c940ef8b55f95b550e9563b85354a7b6c9f7a07089a4e31ff"
+}

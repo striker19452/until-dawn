@@ -23,8 +23,9 @@ export function nightActionInfo(b,p,type){
  const seconds=Number(orderDuration(p,type,b.aidKit).toFixed(2)),time=`${seconds}秒`;
  const data={
   repair:{name:'修补围栏',cost:resourceText(NIGHT_ACTIONS.costs[type]||{}),effect:`目标区耐久+${nightRepairHealth(p.skills.engineering)}，最高100；被占据的破口须先驱赶。`},
-  guard:{name:'驱赶',cost:`每次攻击${COMBAT.strike.stamina}体力`,effect:`追击下令时本区已有生物，留出间隔攻击，打退后恢复分工；普攻距离${STRIKE_RANGE}。`,time:'赶路后攻击'},
+  guard:{name:'驱赶',cost:`每次攻击${COMBAT.strike.stamina}体力`,effect:`追击下令时本区已有生物，留出间隔攻击，打退后恢复分工；普攻距离${STRIKE_RANGE}，只造成短暂眩晕，不削减蓄力进度。`,time:'赶路后攻击'},
   brace:{name:'顶住',cost:`至少${COMBAT.brace.minimumStamina}体力`,effect:`目标区围栏伤害−${Number(((1-COMBAT.brace.fenceFactor)*100).toFixed(2))}%；每秒耗${COMBAT.workStamina}体力，结束另耗${COMBAT.brace.finishStamina}，冷却${COMBAT.brace.cooldown}秒。`},
+  heavy:{name:'蓄力重击',cost:`${COMBAT.heavy.stamina}体力 · 无物资`,effect:`靠近单个目标后蓄力，造成${COMBAT.heavy.damage}伤害、眩晕${COMBAT.heavy.stun}秒并清空蓄力；冷却${COMBAT.heavy.cooldown}秒，可破甲与打断首领。需赶路、体力充足且目标在攻击距离内。`},
   throw:{name:'投掷打断',cost:resourceText(NIGHT_ACTIONS.costs[type]||{}),effect:`本区全体受基础${COMBAT.throw.damage}伤害、眩晕${COMBAT.throw.stun}秒；清空蓄势与攻击计时，可触发首领破招，伤害受护甲／弱点影响。`},
   bait:{name:'放置诱饵',cost:resourceText(NIGHT_ACTIONS.costs.bait),effect:`生效${COMBAT.bait.seconds}秒，吸引${COMBAT.bait.range}距离内普通生物；重撞兽和首领无效。`},
   compact:{name:'压实土道',cost:'无物资',effect:`本夜该区浅掘速度×${COMBAT.compact.factor}；现有掘行兽各受${COMBAT.compact.damage}伤害、眩晕${COMBAT.compact.stun}秒并清空进度，可封巢。`},

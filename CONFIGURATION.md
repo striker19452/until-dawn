@@ -41,3 +41,14 @@ npm run build      # 先生成规则，再构建页面
 `scripts/generate-rules.js` 使用这些相同的配置和说明函数生成 `RULES_CURRENT.md`，不要直接修改生成文件。`test/generated-descriptions.test.js` 会临时改变配置，执行真实动作并对照说明、结算和存档校验；测试结束恢复配置，不写玩家存档。
 
 修改后需要重新构建前端、重启正在运行的 Node 服务，再刷新已打开的游戏页面，使浏览器和服务端采用同一版配置。历史战报、平衡报告、设计稿记录当时版本，不会被生成流程追溯改写。
+
+## 探索见闻与人物关系
+
+地点事件池、同行对白、目标分支、成本与回礼、固定随机判定、关系阈值和跨日回信位于 `src/exploration-story.js`。修改后运行 `npm run docs:rules`；界面预览与实际执行都读取该模块，见闻选择和约定结算走 `src/campaign.js` 的同一套存档事务。
+
+
+2026-11-04：逐关的时间、重点防区、最低耐久和打断目标在 `src/challenges.js` 的 `tactics` 中；Boss 后物种的属性与特殊能力参数在 `src/phase-creatures.js`。`required` 标记使未完成的本夜目标进入可重试结局，不追改没有此标记的旧战报。对照测试用 `npm run audit:tactics`，报告输出到 `reports/2026-11-04-tactics/`。
+
+机器人配置：`src/robots.js` 的 `ROBOT_RULES`、`ROBOT_TYPES` 定义每日燃料、制造与修复费用、速度、视野听距、攻击和修补效率；`src/robot-simulation.js` 执行有序路线与受感知范围限制的调度。`client/assets/robots-v1.json` 管理三类机体的素材裁切与显示尺寸。
+
+机器人动作：`client/robot-motion.js` 从真实进度／事件计算状态，`client/robot-rig.js` 定义现有图集上的部件轮廓和关节点，`client/robot-feedback.js` 绘制作业火花、轮辐、无线信号与受损反馈；均不改变模拟速度、攻击或资源结算。

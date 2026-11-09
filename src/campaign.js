@@ -1,3 +1,4 @@
+import {ROBOT_RULES,ROBOT_TYPES,robotWorkshop,occupiedBeds,normalizeRobots,makeRobot,validRobotPlan} from './robots.js';
 import {CAMPAIGN_RULES,PRODUCTION,DAY_ACTIONS,WORK,RATIONS,GROWTH,COMBAT,RECOVERY,STORY_RULES,EXPOSURE,CHALLENGE_REWARD,generatorOutput,workshopOutput,workshopCost,repairHealth} from './balance.js';
 import {resourceText} from './descriptions.js';
 import {DOG_RULES} from './dog.js';
@@ -14,7 +15,8 @@ import { treatmentMedicine, farmingYield, branch, facility, needs, tradeRules, c
 import { SEARCH_RULES, searchPlan, searchInjury } from './search.js';
 import {MORNING_FATIGUE_RECOVERY,SLEEP_FATIGUE_RECOVERY,dayActionFatigue} from './fatigue.js';
 import {sleepEligible,sleepInterrupted} from './shelter.js';
-import {BUILDING_MAX_HP,BUILDING_REPAIR,BUILDING_PLOTS,buildingHealth,buildingOperational,normalizeBuildingHealth,freeBuildingPlot} from './building-health.js';
+import {recordExplorationSearch,resolveExplorationChoice,resolveExplorationGoal,advanceExplorationMorning,changeBond,explorationEnding,EXPLORATION_STORY_RULES} from './exploration-story.js';
+import {BUILDING_MAX_HP,BUILDING_REPAIR,BUILDING_PLOTS,buildingMaxHealth,buildingHealth,buildingOperational,normalizeBuildingHealth,freeBuildingPlot} from './building-health.js';
 export class RuleError extends Error { constructor(message){super(message);this.name='RuleError';} }
 export const requireRule=(ok,msg)=>{if(!ok)throw new RuleError(msg);};
 export const living=s=>s.people.filter(p=>!p.dead);
@@ -34,8 +36,8 @@ export function normalizeCampaign(s){if(s.phase!=='rescued')recordHealthDeaths(s
  // Recover completed companion jobs in already-prepared saves, including jobs
  // that used to reset to rest. Do not guess which old hero actions were labor.
  if(s.phase==='ready'&&s.dayProduced&&s.preparationBase)for(const p of s.people){const before=s.preparationBase.people.find(q=>q.id===p.id);if(before&&daytimeWork(s.preparationBase,before))p.workedDay=s.day;}
- return normalizeNutrition(normalizeCampaignStamina(normalizeBuildingHealth(s)));}
-export function initialCampaign(seed=417){return {version:2,seed:Math.abs(seed|0)||417,day:1,phase:'prologue',role:null,ap:CAMPAIGN_RULES.ap,resources:{food:5,water:5,materials:14,fuel:6,medicine:2,parts:1},people:[],beds:DAY_ACTIONS.beds.steps[0],house:100,zones:ZONES.map(z=>({id:z.id,hp:65,max:100,traps:0,spikes:false,mesh:false,bell:false,brazier:false,shade:false})),buildings:[],exposure:0,searched:[],flags:{registeredDay:null,route:null,routeWork:0,helped:0,invited:[],declined:[],solo:false},logs:['窗台上的收音机还在。院子外是荒草，屋里有一个能烧水的旧炉子。'],report:null,dayProduced:false,jobGains:[],memories:[],visited:{},generation:0};}
+ return normalizeNutrition(normalizeCampaignStamina(normalizeBuildingHealth(normalizeRobots(s))));}
+export function initialCampaign(seed=417){return {version:2,seed:Math.abs(seed|0)||417,day:1,phase:'prologue',role:null,ap:CAMPAIGN_RULES.ap,resources:{food:5,water:5,materials:14,fuel:6,medicine:2,parts:1},people:[],robots:[],beds:DAY_ACTIONS.beds.steps[0],house:100,zones:ZONES.map(z=>({id:z.id,hp:65,max:100,traps:0,spikes:false,mesh:false,bell:false,brazier:false,shade:false})),buildings:[],exposure:0,searched:[],flags:{registeredDay:null,route:null,routeWork:0,helped:0,invited:[],declined:[],solo:false},logs:['窗台上的收音机还在。院子外是荒草，屋里有一个能烧水的旧炉子。'],report:null,dayProduced:false,jobGains:[],memories:[],visited:{},generation:0};}
 export function log(s,t){s.logs.push(t);s.logs=s.logs.slice(-100);}
 export function afford(s,cost){return Object.entries(cost).every(([k,n])=>Number.isFinite(n)&&n>=0&&s.resources[k]>=n);}
 const resourceObservers=new WeakMap();
@@ -75,13 +77,32 @@ function campaignAction(s,current,a){
   requireRule(s.phase==='report','请先完成这一夜。');requireRule(s.day<28,'救援已经抵达。');s.day++;s.phase='day';s.ap=CAMPAIGN_RULES.ap;s.searched=[];s.dayProduced=false;s.jobGains=[];s.report=null;s.generation++;
   const recover=canRecoverHealth(s);for(const p of living(s)){p.stamina=maxStamina(p);if(p.wound!=='severe'){p.fatigue=clamp(p.fatigue-MORNING_FATIGUE_RECOVERY);p.fear=clamp(p.fear-RECOVERY.morningFear);if(recover)p.health=clamp(p.health+RECOVERY.morningHealth);if(['light','recovering'].includes(p.wound)&&p.health>65)p.wound='none';}}
   if(s.flags.pendingRegistration&&s.flags.pendingRegistration<=s.day){s.flags.registeredDay=s.day-1;s.flags.pendingRegistration=null;log(s,'留言处的志愿者已转报登记，广播开始确认本院编号。');}
+  advanceExplorationMorning(s,{gain:(loot,reason)=>gain(s,loot,reason),log:text=>log(s,text)});
   changeExposure(s,-EXPOSURE.morning,'清晨自然消退');log(s,`第${s.day}天清晨。院子还在，今天还可以做些改变。`);return s;
  }
  if(type==='backDay'){requireRule(s.phase==='ready','当前不在入夜前。');requireRule(s.preparationBase,'当前准备缺少回退记录，请从清晨重新安排。');const day=structuredClone(s.preparationBase);day.phase='day';log(day,'回到白天，黄昏暂结算的产出和工作已一起撤回。');return day;}
  if(type==='prepare'){
   requireRule(s.phase==='day','当前不能准备入夜。');const warnings=danger(s);requireRule(!warnings.length||a.acceptDanger===true,warnings.join('；')+'。请治疗或明确确认。');s.preparationBase=structuredClone(current);produce(s);s.phase='ready';log(s,'白天安排已经结算。入夜前准备已保存，夜战过程中不存档。');return s;
  }
+
+ if(type==='robotPlan'){
+  requireRule(['day','ready'].includes(s.phase),'只能在白天或黄昏设置规划。');const r=s.robots.find(r=>r.id===a.id);requireRule(r,'机器人不存在。');requireRule(validRobotPlan(a.plan),'规划需含1至8个有效巡逻点，停留0至10秒，维修阈值10至100，建材与零件预算各0至20。');r.plan=structuredClone(a.plan);
+  if(s.preparationBase){const before=s.preparationBase.robots?.find(q=>q.id===r.id);if(before)before.plan=structuredClone(a.plan);}return s;
+ }
  requireRule(s.phase==='day','这项操作只能在白天进行。');
+ if(type==='explorationChoice'||type==='explorationGoal'){
+  const hooks={requireRule,useAP:(ap,cost)=>ap>0?useAP(s,ap,cost):pay(s,cost),gain:(loot,reason)=>gain(s,loot,reason),log:text=>log(s,text)};
+  if(type==='explorationChoice')resolveExplorationChoice(s,a,hooks);else resolveExplorationGoal(s,a,hooks);return s;
+ }
+ if(type==='buildRobot'){
+  requireRule(robotWorkshop(s),'需要先将工作棚升级到二级，且保持可用。');requireRule(Object.hasOwn(ROBOT_TYPES,a.robot),'没有这种机器人。');requireRule(occupiedBeds(s)<s.beds,'床位不足：每个机器人占1床，请先扩建或拆解闲置机器人。');useAP(s,ROBOT_RULES.ap,ROBOT_TYPES[a.robot].cost);const r=makeRobot(s,a.robot);s.robots.push(r);log(s,`${r.name}已制造，占1床；每天黄昏耗${ROBOT_RULES.fuel}燃料。请设置巡逻规划。`);return s;
+ }
+ if(['toggleRobot','restoreRobot','scrapRobot'].includes(type)){
+  const r=s.robots.find(r=>r.id===a.id);requireRule(r,'机器人不存在。');
+  if(type==='toggleRobot'){r.enabled=!r.enabled;return s;}
+  if(type==='restoreRobot'){requireRule(robotWorkshop(s),'维修机器人机体需要可用的二级工作棚。');requireRule(r.hp<ROBOT_RULES.hp,'机体已经完好。');useAP(s,ROBOT_RULES.restore.ap,ROBOT_RULES.restore.cost);r.hp=ROBOT_RULES.hp;return s;}
+  useAP(s,ROBOT_RULES.scrap.ap);gain(s,ROBOT_RULES.scrap.gain,'拆解机器人');s.robots=s.robots.filter(q=>q.id!==r.id);log(s,`${r.name}已拆解，腾出1个床位。`);return s;
+ }
  if(type==='adoptDog'){
   requireRule(!s.flags.dog,'院子里已经收留了一只小狗。');
   s.flags.dog={name:DOG_RULES.name,adoptedDay:s.day};
@@ -109,22 +130,22 @@ function campaignAction(s,current,a){
   if(a.site==='contact'&&s.flags.route)s.flags.routeDelivered=s.day;
   if(a.site==='market'&&!s.flags.neighborKnown){s.flags.neighborKnown=true;log(s,'摊主带你认识了桥边互助院。邻居确认有临时床位，愿意转移的同伴可在白天带着口粮同行。');}
   if(a.site==='rescue'&&s.flags.routeWork<RESCUE_RULES.routeCap){s.flags.routeWork++;log(s,'顺路清理了接应标记，路线准备 +1。');}
-  log(s,`搜索${site.name}：${Object.entries(loot).map(([k,v])=>`${RESOURCE_NAMES[k]} +${v}`).join('，')}。`);return s;
+  log(s,`搜索${site.name}：${Object.entries(loot).map(([k,v])=>`${RESOURCE_NAMES[k]} +${v}`).join('，')}。`);recordExplorationSearch(s,a.site,escort);return s;
  }
  if(type==='build'){
-  const def=BUILDINGS[a.building];requireRule(def,'没有这种设施。');requireRule(s.buildings.length<BUILDING_PLOTS,`${BUILDING_PLOTS}个经营位置已满，可以在废墟上重建或清理腾位。`);requireRule(s.buildings.filter(b=>b.type===a.building).length<def.limit,'这种设施已达到数量上限。');const plot=freeBuildingPlot(s);useAP(s,DAY_ACTIONS.build.ap,{materials:def.cost});s.buildings.push({id:`b${s.day}-${s.generation}-${plot}-${s.ap}`,type:a.building,plot,level:1,age:0,branch:'normal',enabled:true,hp:BUILDING_MAX_HP});log(s,`建成${def.name}。产出在黄昏结算。`);return s;
+  const def=BUILDINGS[a.building];requireRule(def,'没有这种设施。');requireRule(s.buildings.length<BUILDING_PLOTS,`${BUILDING_PLOTS}个经营位置已满，可以在废墟上重建或清理腾位。`);requireRule(s.buildings.filter(b=>b.type===a.building).length<def.limit,'这种设施已达到数量上限。');const plot=freeBuildingPlot(s);useAP(s,DAY_ACTIONS.build.ap,{materials:def.cost});s.buildings.push({id:`b${s.day}-${s.generation}-${plot}-${s.ap}`,type:a.building,plot,level:1,age:0,branch:'normal',enabled:true,hp:buildingMaxHealth(a.building)});log(s,`建成${def.name}。产出在黄昏结算。`);return s;
  }
  if(type==='upgradeBuilding'){
   const b=s.buildings.find(b=>b.id===a.id);requireRule(b&&b.level===1,'只能升级一级设施。');requireRule(buildingOperational(b),'设施已损毁，请先维修。');requireRule(['yield','steady'].includes(a.branch),'请选择高产或耐候分支。');useAP(s,DAY_ACTIONS.upgrade.ap,DAY_ACTIONS.upgrade.cost);b.level=2;b.branch=a.branch;return s;
  }
  if(type==='repairBuilding'){
-  const b=s.buildings.find(b=>b.id===a.id);requireRule(b,'设施不存在。');requireRule(buildingOperational(b),'设施已损毁，需要原址重建或清理废墟。');requireRule(buildingHealth(b)<BUILDING_MAX_HP,'设施已经完好。');useAP(s,BUILDING_REPAIR.ap,{materials:BUILDING_REPAIR.materials});b.hp=BUILDING_MAX_HP;log(s,`${BUILDINGS[b.type].name}已修复至${BUILDING_MAX_HP}耐久，保留原等级和分支。`);return s;
+  const b=s.buildings.find(b=>b.id===a.id);requireRule(b,'设施不存在。');requireRule(buildingOperational(b),'设施已损毁，需要原址重建或清理废墟。');const maxHp=buildingMaxHealth(b.type);requireRule(buildingHealth(b)<maxHp,'设施已经完好。');useAP(s,BUILDING_REPAIR.ap,{materials:BUILDING_REPAIR.materials});b.hp=maxHp;log(s,`${BUILDINGS[b.type].name}已修复至${maxHp}耐久，保留原等级和分支。`);return s;
  }
  if(type==='rebuildBuilding'){
-  const i=s.buildings.findIndex(b=>b.id===a.id);requireRule(i>=0,'废墟不存在。');const ruin=s.buildings[i],def=BUILDINGS[a.building];requireRule(buildingHealth(ruin)===0,'仅能在损毁后的废墟上重建。');requireRule(def,'请选择要重建的新设施。');requireRule(s.buildings.filter((b,j)=>j!==i&&b.type===a.building).length<def.limit,'这种设施已达到数量上限，请换一种设施。');useAP(s,DAY_ACTIONS.build.ap,{materials:def.cost});s.buildings[i]={id:`b${s.day}-${s.generation}-${ruin.plot}-${s.ap}`,type:a.building,plot:ruin.plot,level:1,age:0,branch:'normal',enabled:true,hp:BUILDING_MAX_HP};log(s,`清理${BUILDINGS[ruin.type].name}废墟，原址新建${def.name}：一级、${BUILDING_MAX_HP}耐久，种植进度重新开始。`);return s;
+  const i=s.buildings.findIndex(b=>b.id===a.id);requireRule(i>=0,'废墟不存在。');const ruin=s.buildings[i],def=BUILDINGS[a.building];requireRule(buildingHealth(ruin)===0,'仅能在损毁后的废墟上重建。');requireRule(def,'请选择要重建的新设施。');requireRule(s.buildings.filter((b,j)=>j!==i&&b.type===a.building).length<def.limit,'这种设施已达到数量上限，请换一种设施。');useAP(s,DAY_ACTIONS.build.ap,{materials:def.cost});s.buildings[i]={id:`b${s.day}-${s.generation}-${ruin.plot}-${s.ap}`,type:a.building,plot:ruin.plot,level:1,age:0,branch:'normal',enabled:true,hp:buildingMaxHealth(a.building)};log(s,`清理${BUILDINGS[ruin.type].name}废墟，原址新建${def.name}：一级、${buildingMaxHealth(a.building)}耐久，种植进度重新开始。`);return s;
  }
  if(type==='demolish'){
-  const i=s.buildings.findIndex(b=>b.id===a.id);requireRule(i>=0,'设施不存在。');const b=s.buildings[i];useAP(s,DAY_ACTIONS.demolish.ap);gain(s,{materials:Math.floor(BUILDINGS[b.type].cost*DAY_ACTIONS.demolish.recovery*buildingHealth(b)/BUILDING_MAX_HP)},'拆除回收');s.buildings.splice(i,1);log(s,buildingHealth(b)===0?'废墟已清理，原经营位置已腾空；不返还建材。':'拆除按剩余耐久回收部分建材，不返还已经消耗的工时。');return s;
+  const i=s.buildings.findIndex(b=>b.id===a.id);requireRule(i>=0,'设施不存在。');const b=s.buildings[i];useAP(s,DAY_ACTIONS.demolish.ap);gain(s,{materials:Math.floor(BUILDINGS[b.type].cost*DAY_ACTIONS.demolish.recovery*buildingHealth(b)/buildingMaxHealth(b.type))},'拆除回收');s.buildings.splice(i,1);log(s,buildingHealth(b)===0?'废墟已清理，原经营位置已腾空；不返还建材。':'拆除按剩余耐久回收部分建材，不返还已经消耗的工时。');return s;
  }
  if(type==='toggleGenerator'){const b=facility(s,'generator');requireRule(b,'没有可用的发电设施，请先建造或维修。');b.enabled=!b.enabled;return s;}
  if(type==='beds'){requireRule(s.beds<DAY_ACTIONS.beds.steps.at(-1),'床位已经达到上限。');useAP(s,DAY_ACTIONS.beds.ap,DAY_ACTIONS.beds.cost);s.beds=DAY_ACTIONS.beds.steps.find(n=>n>s.beds);return s;}
@@ -151,7 +172,7 @@ function campaignAction(s,current,a){
   const p=member(s,a.person);requireRule(p.wound==='severe'&&!p.extended,'只能为未延长窗口的重伤者提供一次基础护理。');useAP(s,DAY_ACTIONS.firstAid.ap,DAY_ACTIONS.firstAid.cost);p.deadline+=DAY_ACTIONS.firstAid.days;p.extended=true;log(s,`${p.name}的救治窗口延长到第${p.deadline}天结束。`);return s;
  }
  if(type==='recruit'){
-  const c=candidates(s).find(c=>c.id===a.person);requireRule(c,'当前没有这位来访者。');requireRule(living(s).length<CAMPAIGN_RULES.maxPeople,`含主角最多${CAMPAIGN_RULES.maxPeople===5?'五':CAMPAIGN_RULES.maxPeople}人。`);requireRule(living(s).length<s.beds,'床位不足，先扩建或约定稍后。');const p=makePerson(c.id,c.name,c.role,c.skill);p.joinedDay=s.day;p.fear=18;p.story=1;p.nightRole='support';p.zone=ZONES[living(s).length%5].id;s.people.push(p);s.flags.invited.push(c.id);log(s,`${c.name}住了进来：${c.story[0]} 每天基础消耗${RATIONS.baseFood}食物、${RATIONS.baseWater}净水；白天工作加${RATIONS.workFood}、参与夜战加${RATIONS.nightFood}食物。`);return s;
+  const c=candidates(s).find(c=>c.id===a.person);requireRule(c,'当前没有这位来访者。');requireRule(living(s).length<CAMPAIGN_RULES.maxPeople,`含主角最多${CAMPAIGN_RULES.maxPeople===5?'五':CAMPAIGN_RULES.maxPeople}人。`);requireRule(occupiedBeds(s)<s.beds,'床位不足（机器人也占1床），先扩建或约定稍后。');const p=makePerson(c.id,c.name,c.role,c.skill);p.joinedDay=s.day;p.fear=18;p.story=1;p.nightRole='support';p.zone=ZONES[living(s).length%5].id;s.people.push(p);s.flags.invited.push(c.id);log(s,`${c.name}住了进来：${c.story[0]} 每天基础消耗${RATIONS.baseFood}食物、${RATIONS.baseWater}净水；白天工作加${RATIONS.workFood}、参与夜战加${RATIONS.nightFood}食物。`);return s;
  }
  if(type==='decline'){requireRule(candidates(s).some(c=>c.id===a.person),'当前没有这位来访者。');s.flags.declined.push(a.person);log(s,'你们约定在社区公告处留下消息。拒绝收留不会使对方突然遇害。');return s;}
  if(type==='solo'){s.flags.solo=!s.flags.solo;return s;}
@@ -167,7 +188,7 @@ function campaignAction(s,current,a){
  }
  if(type==='nightRole'){const p=member(s,a.person);requireRule(NIGHT_ROLES[a.role],'岗位不存在。');requireRule(p.wound!=='severe'||a.role==='sleep','重伤者只能休息。');p.nightRole=a.role;if(a.zone)p.zone=zone(s,a.zone).id;return s;}
  if(type==='story'){
-  const p=member(s,a.person),c=COMPANIONS.find(c=>c.id===p.id);requireRule(c&&p.story>0&&p.story<3,'当前没有待推进的个人故事。');requireRule(s.day>=p.joinedDay+Math.min(p.story===1?2:4,Math.max(0,28-p.joinedDay)),'再相处一些时间，新的线索会出现。');requireRule(s.visited[c.site]>0,`需要先到${SITES[c.site].name}寻找线索。`);useAP(s,STORY_RULES.personal.ap);log(s,c.story[p.story]);p.story++;p.fear=clamp(p.fear-STORY_RULES.personal.fear);if(p.story===3){s.memories.push(c.reward);p.skills[c.skill]=Math.min(GROWTH.max,p.skills[c.skill]+GROWTH.story);}return s;
+  const p=member(s,a.person),c=COMPANIONS.find(c=>c.id===p.id);requireRule(c&&p.story>0&&p.story<3,'当前没有待推进的个人故事。');requireRule(s.day>=p.joinedDay+Math.min(p.story===1?2:4,Math.max(0,28-p.joinedDay)),'再相处一些时间，新的线索会出现。');requireRule(s.visited[c.site]>0,`需要先到${SITES[c.site].name}寻找线索。`);useAP(s,STORY_RULES.personal.ap);log(s,c.story[p.story]);p.story++;p.fear=clamp(p.fear-STORY_RULES.personal.fear);changeBond(s,p.id,EXPLORATION_STORY_RULES.storyBond,'记住了对方的牵挂');if(p.story===3){s.memories.push(c.reward);p.skills[c.skill]=Math.min(GROWTH.max,p.skills[c.skill]+GROWTH.story);}return s;
  }
  if(type==='trade'){
   requireRule(countBuilding(s,'exchange')||s.searched.includes('market'),'需要留言处或当天到访集市。');requireRule((s.flags.tradeDay===s.day?s.flags.trades:0)<tradeRules(s).limit,'今日交换库存用完，明天再看看。');const trades=tradeRules(s).offers;const t=trades[a.offer];requireRule(t,'没有这项交换。');pay(s,t.pay);gain(s,t.get,'物资交换所得');if(s.flags.tradeDay!==s.day){s.flags.tradeDay=s.day;s.flags.trades=0;}s.flags.trades++;return s;
@@ -204,11 +225,18 @@ function produce(s){
   if(job==='escort')summaries.push(`${p.name}随行已结算：疲劳+${SEARCH_RULES.escortFatigue}，不重复计入黄昏工作，也不领取休息恢复`);
   p.reserved={};if(['craft','repair','escort'].includes(job))p.job='rest';
  }
+ for(const r of s.robots){
+  r.poweredDay=null;
+  if(!r.enabled||r.hp<=0){summaries.push(`${r.name}${r.hp<=0?'损坏待修':'手动停机'}，不耗燃料，仍占1床`);continue;}
+  if(s.resources.fuel>=ROBOT_RULES.fuel){pay(s,{fuel:ROBOT_RULES.fuel},`${r.name} · 每日供油`);r.poweredDay=s.day;summaries.push(`${r.name}供油完成，燃料−${ROBOT_RULES.fuel}`);}
+  else summaries.push(`${r.name}缺油停机：需要${ROBOT_RULES.fuel}燃料，仍占1床`);
+ }
  if(canRecoverHealth(s))for(const heal of healing)heal();else if(healing.length)summaries.push('食物或净水不足：休息、护理和医务角暂停恢复健康');
  s.jobGains=summaries;for(const line of summaries)log(s,line);
 }
 export function settleNight(base,battle){
  const s=structuredClone(base);requireRule(base.phase==='ready','结算基准不是入夜准备。');s.resources=structuredClone(battle.resources);s.zones=structuredClone(battle.zones);s.house=battle.house;s.buildings=s.buildings.map(before=>({...before,hp:buildingHealth(battle.buildings?.find(b=>b.id===before.id)||before)}));s.people=structuredClone(battle.people).map(p=>{const assigned=base.people.find(q=>q.id===p.id);p.nightRole=assigned.nightRole;p.zone=assigned.zone;delete p.x;delete p.y;delete p.task;delete p.manualPosition;delete p.cooldown;return p;});
+ s.robots=(base.robots||[]).map(r=>({...r,hp:battle.robots?.find(q=>q.id===r.id)?.hp??r.hp,plan:structuredClone(r.plan)}));
  s.flags.campfireWood=campfireWood(battle.fires.find(f=>f.id==='central')?.wood??base.flags.campfireWood);
  delete s.preparationBase;
  const demand=needs({...s,weather:weather(s.day,s.seed)}),foodNeed=demand.food,waterNeed=demand.water;const foodUsed=Math.min(s.resources.food,foodNeed),waterUsed=Math.min(s.resources.water,waterNeed);s.resources.food-=foodUsed;s.resources.water-=waterUsed;
@@ -221,17 +249,19 @@ export function settleNight(base,battle){
   if(p.health<=0){if(markDead(p,'shortage'))deaths.push(p.name);}else if(p.wound==='severe'&&p.deadline<=s.day){if(markDead(p,'deadline'))deaths.push(p.name);}
  }
  s.flags.seenTypes=[...new Set([...(s.flags.seenTypes||[]),...(battle.seen||[])])];
- const hero=s.people.find(p=>p.id==='hero');s.phase=s.house<=0||hero.dead?'failed':s.day===28?'rescued':'report';
+ const hero=s.people.find(p=>p.id==='hero');s.phase=s.house<=0||hero.dead||battle.challenge?.required&&battle.challenge.status==='missed'?'failed':s.day===28?'rescued':'report';
  const challenge=battle.challenge?structuredClone(battle.challenge):null;
- if(challenge&&(s.phase==='failed'||deaths.length)){challenge.status='missed';challenge.feedback=hero.dead?deathReason(hero):s.house<=0?'小屋失守；留足修补材料，并及时处理入院生物。':`${deaths.join('、')}死亡，本次挑战未完成。`;}
+ if(challenge&&(s.phase==='failed'||deaths.length)){challenge.status='missed';challenge.feedback=hero.dead?deathReason(hero):s.house<=0?'小屋失守；留足修补材料，并及时处理入院生物。':deaths.length?`${deaths.join('、')}死亡，本次挑战未完成。`:challenge.feedback;}
+ if(challenge?.required&&challenge.status==='missed')s.phase='failed';
  if(challenge?.status==='cleared'&&s.phase!=='failed'){s.resources.materials+=CHALLENGE_REWARD.materials;for(const p of living(s))p.fear=clamp(p.fear-CHALLENGE_REWARD.fear);s.achievements||=[];if(!s.achievements.some(x=>x.day===s.day))s.achievements.push({day:s.day,title:challenge.title});log(s,`夜间挑战「${challenge.title}」完成：建材+${CHALLENGE_REWARD.materials}，全员恐惧−${CHALLENGE_REWARD.fear}。`);}
- const facilityNotes=s.buildings.filter(b=>buildingHealth(b)<buildingHealth(base.buildings.find(q=>q.id===b.id))).map(b=>`${BUILDINGS[b.type].name}：耐久${formatDurability(b.hp)}/${BUILDING_MAX_HP}${b.hp===0?'，已损毁、停止生效':''}。`);for(const line of facilityNotes)log(s,line);
+ const facilityNotes=s.buildings.filter(b=>buildingHealth(b)<buildingHealth(base.buildings.find(q=>q.id===b.id))).map(b=>`${BUILDINGS[b.type].name}：耐久${formatDurability(b.hp)}/${buildingMaxHealth(b.type)}${b.hp===0?'，已损毁、停止生效':''}。`);for(const line of facilityNotes)log(s,line);
  const deathNotes=s.people.filter(p=>deaths.includes(p.name)).map(deathReason);for(const line of deathNotes)log(s,line);
  const sleepNotes=s.people.filter(p=>p.nightRole==='sleep'&&sleepInterrupted(battle,p)).map(p=>`${p.name}睡眠已中断：本夜未获得睡眠收益，未恢复${SLEEP_FATIGUE_RECOVERY}疲劳。`);for(const line of sleepNotes)log(s,line);
  s.report={elapsed:Number(battle.elapsed.toFixed(2)),challenge,defenseLosses:structuredClone(battle.defenseLosses||[]),day:s.day,foodUsed,waterUsed,hungry,thirsty,nutritionDamage:(hungry?RATIONS.shortageDamage:0)+(thirsty?RATIONS.shortageDamage:0),breaches:battle.breaches,house:s.house,events:[...battle.log,...deathNotes,...sleepNotes,...facilityNotes].slice(-16),deaths,materialsUsed:Number(Math.max(0,base.resources.materials-s.resources.materials+(base.flags.campfireWood||0)-(s.flags.campfireWood||0)+(challenge?.status==='cleared'?CHALLENGE_REWARD.materials:0)).toFixed(4)),fuelUsed:Math.max(0,base.resources.fuel-s.resources.fuel),saved:true};
+ if(s.robots.length)s.report.robots={fuelUsed:s.robots.filter(r=>r.poweredDay===s.day).length*ROBOT_RULES.fuel,damaged:s.robots.filter(r=>r.hp<=0).map(r=>r.name),dispatches:(battle.robots||[]).reduce((sum,r)=>sum+(r.dispatches||0),0),repairs:structuredClone(battle.robotRepairs||[])};
  if(s.flags.dog)s.report.dog={foodUsed:Math.min(DOG_RULES.food,foodUsed),barks:battle.dog?.barks||0,retreats:battle.dog?.retreats||0};
  if(battle.boss){const boss=battle.boss;s.report.boss={id:boss.id,name:BOSS_SPECIES[boss.id].name,defeated:boss.defeated,sealed:boss.sealed,summons:boss.summons,split:boss.split,revives:boss.revives};}
- if(s.phase==='rescued'){s.ending={people:living(s).map(p=>p.name),route:s.flags.route||'public',closePickup:rescueBenefits(s).closePickup,helped:s.flags.helped,memories:s.memories,text:living(s).length===1?'你关好炉子，把那张写着「这里曾经有人好好生活」的纸条留在桌上。天亮了。':'杯子收好了。门口的脚步终于来自人类。你们为后来的人留下了种子和一张纸条。'};}
+ if(s.phase==='rescued'){s.ending={people:living(s).map(p=>p.name),route:s.flags.route||'public',closePickup:rescueBenefits(s).closePickup,helped:s.flags.helped,memories:s.memories,exploration:explorationEnding(s),text:living(s).length===1?'你关好炉子，把那张写着「这里曾经有人好好生活」的纸条留在桌上。天亮了。':'杯子收好了。门口的脚步终于来自人类。你们为后来的人留下了种子和一张纸条。'};}
  log(s,`第${s.day}夜结束：食物-${foodUsed}，净水-${waterUsed}，破口${battle.breaches}处。${hungry||thirsty?`${hungry?`饥饿：每人健康−${RATIONS.shortageDamage}。`:''}${thirsty?`缺水：每人健康−${RATIONS.shortageDamage}。`:''}补给不足时暂停自动回血。`:'院子里的灯还亮着。'}`);return s;
 }
 export function migrateLegacy(old,seed=417,{preserveUnstarted=false}={}){

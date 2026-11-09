@@ -1,3 +1,4 @@
+import {ROBOT_RULES,validRobotPlan,defaultRobotPlan} from './robots.js';
 import {CHALLENGE_REWARD,GROWTH,COMBAT,RATIONS,BOSS_RULES,NIGHT_ACTIONS} from './balance.js';
 import {DEATH_CAUSES} from './health.js';
 import {ATTACHED_DEFENSES,destroyZoneDefenses} from './zone-defenses.js';
@@ -6,7 +7,7 @@ import {bossForDay} from './boss-content.js';
 import { RuleError } from './campaign.js';
 import { RESOURCE_NAMES,SKILLS,ZONES,ENEMIES } from './content.js';
 import {maxStamina} from './rules.js';
-import {buildingHealth,BUILDING_MAX_HP} from './building-health.js';
+import {buildingHealth,buildingMaxHealth,BUILDING_MAX_HP} from './building-health.js';
 import {DOG_RULES} from './dog.js';
 const assert=(ok,text)=>{if(!ok)throw new RuleError(text);};
 const equal=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
@@ -16,7 +17,7 @@ const meter=n=>Number.isFinite(n)&&n>=0&&n<=100;
 // simulation: the server never moves entities, attacks, or replays the night.
 export function validateClientResult(base,state){
  assert(state&&typeof state==='object'&&!Array.isArray(state),'缺少本地夜战结果。');
- const mutable=new Set(['resources','people','zones','buildings','house','phase','report','flags','logs','achievements','ending','preparationBase']);
+ const mutable=new Set(['resources','robots','people','zones','buildings','house','phase','report','flags','logs','achievements','ending','preparationBase']);
  for(const key of Object.keys(state))assert(Object.hasOwn(base,key)||mutable.has(key),'结果含有未知存档字段。');
  for(const key of Object.keys(base))if(!mutable.has(key))assert(equal(base[key],state[key]),`夜战不能修改${key}。`);
  assert(!state.preparationBase,'结果中不应包含临时准备副本。');
@@ -27,13 +28,37 @@ export function validateClientResult(base,state){
   // Earlier open pages identify plots by array order. Preserve the new stable
   // placement when those pages finish; supplied plot edits are still rejected.
   if(building.plot===undefined&&before.plot!==undefined)building.plot=before.plot;
+  // An older open page may report a tower on the ten-point scale.
+  const legacyTower=before.type==='watchtower'&&building.maxHp===undefined;
+  let hp=building.hp;
+  if(hp===undefined)hp=buildingHealth(before);
+  else if(legacyTower){
+   assert(Number.isFinite(hp)&&hp<=BUILDING_MAX_HP,'设施耐久无效。');
+   hp=buildingHealth(building);
+  }
+  if(legacyTower&&before.maxHp!==undefined)building.maxHp=before.maxHp;
   for(const key of new Set([...Object.keys(before),...Object.keys(building)]))if(key!=='hp')assert(equal(before[key],building[key]),'夜间只能改变设施耐久。');
-  // An old browser does not have durability yet: preserve its prepared value.
-  const hp=building.hp===undefined?buildingHealth(before):building.hp;
-  assert(Number.isFinite(hp)&&hp>=0&&hp<=BUILDING_MAX_HP&&hp<=buildingHealth(before),'设施耐久无效。');
+  assert(Number.isFinite(hp)&&hp>=0&&hp<=buildingMaxHealth(before.type)&&hp<=buildingHealth(before),'设施耐久无效。');
   building.hp=hp;
  }
  for(const key of Object.keys(RESOURCE_NAMES))assert(Number.isInteger(state.resources?.[key])&&state.resources[key]>=0&&state.resources[key]<=base.resources[key]+(key==='materials'?CHALLENGE_REWARD.materials:0),'夜战库存无效。');
+ const robots=state.robots||[],beforeRobots=base.robots||[];
+ assert(Array.isArray(robots)&&robots.length===beforeRobots.length,'机器人名单不匹配。');
+ const robotRepairs=state.report?.robots?.repairs||[],repairSpent=new Map(),repairGains=new Map();
+ assert(Array.isArray(robotRepairs)&&robotRepairs.length<=beforeRobots.reduce((sum,r)=>sum+(r.type==='repair'?(r.plan.parts??defaultRobotPlan().parts):0),0)/ROBOT_RULES.robotRepairCost,'机器人维修记录无效。');
+ for(const repair of robotRepairs){
+  const worker=beforeRobots.find(r=>r.id===repair?.repairerId),target=beforeRobots.find(r=>r.id===repair?.targetId);
+  assert(worker?.type==='repair'&&worker.enabled&&worker.hp>0&&worker.poweredDay===base.day&&target&&target.id!==worker.id&&Number.isFinite(repair.gain)&&repair.gain>0&&repair.gain<=ROBOT_RULES.repairGain,'机器人维修记录无效。');
+  repairSpent.set(worker.id,(repairSpent.get(worker.id)||0)+ROBOT_RULES.robotRepairCost);repairGains.set(target.id,(repairGains.get(target.id)||0)+repair.gain);
+  assert(repairSpent.get(worker.id)<=(worker.plan.parts??defaultRobotPlan().parts),'机器人维修超出零件预算。');
+ }
+ const repairParts=robotRepairs.length*ROBOT_RULES.robotRepairCost;
+ assert(repairParts<=base.resources.parts-state.resources.parts,'机器人维修缺少零件消耗。');
+ for(const [i,r]of robots.entries()){
+  const before=beforeRobots[i];assert(r&&typeof r==='object'&&!Array.isArray(r),'机器人结果无效。');
+  for(const key of new Set([...Object.keys(before),...Object.keys(r)]))if(!['hp','plan'].includes(key))assert(equal(r[key],before[key]),'夜间不能更换机器人身份或供油状态。');
+  assert(Number.isFinite(r.hp)&&r.hp>=0&&r.hp<=before.hp+(repairGains.get(r.id)||0)+1e-8&&r.hp<=ROBOT_RULES.hp,'机器人耐久无效。');assert(validRobotPlan(r.plan),'机器人规划无效。');assert(equal(r.plan,before.plan),'夜间不能改变机器人模式或巡逻规划。');
+ }
  assert(Array.isArray(state.people)&&state.people.length===base.people.length,'夜战成员名单不匹配。');
  for(const [i,p]of state.people.entries()){
   const before=base.people[i];
@@ -72,13 +97,14 @@ export function validateClientResult(base,state){
  assert(Array.isArray(state.flags.seenTypes)&&state.flags.seenTypes.length<=Object.keys(ENEMIES).length&&state.flags.seenTypes.every(type=>Object.hasOwn(ENEMIES,type)),'见闻记录无效。');
  assert(Array.isArray(state.logs)&&state.logs.length<=100&&state.logs.every(s=>typeof s==='string'&&s.length<=2000),'日志结果无效。');
  assert(!state.achievements||Array.isArray(state.achievements)&&state.achievements.length<=28,'成就记录无效。');
- const phase=state.house<=0||state.people.find(p=>p.id==='hero')?.dead?'failed':base.day===28?'rescued':'report';
+ const phase=state.house<=0||state.people.find(p=>p.id==='hero')?.dead||state.report?.challenge?.required===true&&state.report.challenge.status==='missed'?'failed':base.day===28?'rescued':'report';
  assert(state.phase===phase,'夜战结局状态不匹配。');
  assert(state.report?.day===base.day&&state.report.saved===true,'缺少完整战报。');
  if(state.report.elapsed!==undefined)assert(Number.isFinite(state.report.elapsed)&&state.report.elapsed>=0,'守夜用时无效。');
  if(state.report.defenseLosses!==undefined){const losses=state.report.defenseLosses;assert(Array.isArray(losses)&&losses.length<=5&&new Set(losses.map(loss=>loss?.zone)).size===losses.length&&losses.every(loss=>ZONES.some(z=>z.id===loss?.zone)&&Array.isArray(loss.defenses)&&loss.defenses.length>0&&loss.defenses.length<=6&&loss.defenses.every(name=>typeof name==='string'&&name.length<=20)),'附属设施损毁记录无效。');}
- if(state.report.boss){const boss=state.report.boss,def=bossForDay(base.day);assert(def&&boss.id===def.id&&boss.name===def.name&&typeof boss.defeated==='boolean'&&typeof boss.split==='boolean','首领战报无效。');for(const [key,max]of [['sealed',20],['summons',BOSS_RULES.brood.limit],['revives',BOSS_RULES.twin.revives]])assert(Number.isInteger(boss[key])&&boss[key]>=0&&boss[key]<=max,'首领机制记录无效。');}
+ if(state.report.boss){const boss=state.report.boss,def=bossForDay(base.day);assert(def&&boss.id===def.id&&boss.name===def.name&&typeof boss.defeated==='boolean'&&typeof boss.split==='boolean','首领战报无效。');for(const [key,max]of [['sealed',Number.MAX_SAFE_INTEGER],['summons',Number.MAX_SAFE_INTEGER],['revives',BOSS_RULES.twin.revives]])assert(Number.isSafeInteger(boss[key])&&boss[key]>=0&&boss[key]<=max,'首领机制记录无效。');}
  assert(typeof state.report.hungry==='boolean'&&typeof state.report.thirsty==='boolean','补给结算状态无效。');
+ if(robots.length){const report=state.report.robots;assert(report&&report.fuelUsed===beforeRobots.filter(r=>r.poweredDay===base.day).length*ROBOT_RULES.fuel&&Number.isSafeInteger(report.dispatches)&&report.dispatches>=0&&report.dispatches<=10000&&equal(report.damaged,robots.filter(r=>r.hp<=0).map(r=>r.name)),'机器人战报无效。');}
  if(state.report.dog){const dog=state.report.dog;assert(base.flags.dog&&Number.isInteger(dog.foodUsed)&&dog.foodUsed>=0&&dog.foodUsed<=DOG_RULES.food&&dog.foodUsed<=state.report.foodUsed&&Number.isInteger(dog.barks)&&dog.barks>=0&&dog.barks<=100&&Number.isInteger(dog.retreats)&&dog.retreats>=0&&dog.retreats<=dog.barks,'小狗战报无效。');}
  if(Object.hasOwn(state.report,'nutritionDamage'))assert(state.report.nutritionDamage===(state.report.hungry?RATIONS.shortageDamage:0)+(state.report.thirsty?RATIONS.shortageDamage:0),'补给伤害结算无效。');
  for(const key of ['foodUsed','waterUsed','breaches','materialsUsed','fuelUsed'])assert(Number.isFinite(state.report[key])&&state.report[key]>=0,'战报数值无效。');

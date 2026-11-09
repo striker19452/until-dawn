@@ -3,6 +3,7 @@ import {RATIONS,PRODUCTION,WORK,DAY_ACTIONS} from './balance.js';
 import {SEARCH_RULES} from './search.js';
 import {BOSS_SPECIES,bossForDay,BOSS_FORM_SPEED} from './boss-content.js';
 import {weakestZone} from './skitter.js';
+import {PHASE_CREATURES} from './phase-creatures.js';
 export const RESOURCE_NAMES={food:'食物',water:'净水',materials:'建材',fuel:'燃料',medicine:'药品',parts:'零件'};
 export const SKILLS=['survival','engineering','guard','exploration','medical'];
 export const SKILL_NAMES={survival:'生存',engineering:'工程',guard:'守卫',exploration:'探索',medical:'护理'};
@@ -39,16 +40,16 @@ export const SITES={
  contact:{name:'社区联络点',day:4,loot:{materials:2,fuel:1},desc:'登记箱与公告板；没有住宿和充足补给。'},
  rescue:{name:'北堤接应区',day:15,loot:{materials:4,fuel:3,parts:1},desc:'清理接应路线，按广播留下可见标记。'}
 };
-export const ENEMY_WINDUP={climb:6,dig:7,call:3.5,spray:4};
+export const ENEMY_WINDUP={climb:6,dig:3,call:3.5,spray:4};
 export const ENEMIES={
  walker:{name:'灰行者',day:1,hp:34.5,speed:18,damage:3,interval:1.55,warning:'巷口有成群脚印。中央篝火能在全场削弱普通生物的伤害。',color:0x657369},
  climber:{name:'攀爬者',day:3,hp:31.5,speed:44,agile:true,damage:2,interval:1.5,warning:'墙头有细长抓痕；翻刺和及时驱赶能阻止攀爬。',color:0x8d9271},
  rammer:{name:'重撞兽',day:9,hp:97.5,speed:12,damage:15,interval:4,warning:'发现重足迹，冲撞前会明显蓄力。路障可以打断冲势。',color:0x9d806a},
- caller:{name:'啼叫者',day:12,hp:39,speed:16,damage:2,interval:2,warning:'远处有反复叫声；蓄叫时驱赶或投掷可打断。',color:0x9b8a98},
+ caller:{name:'啼叫者',day:12,hp:39,speed:16,damage:2,interval:2,warning:'远处有反复叫声；重击或触发陷阱可打断蓄叫，普通攻击只造成短暂眩晕。',color:0x9b8a98},
  burrower:{name:'掘行兽',day:16,hp:45,speed:34,agile:true,damage:3,interval:2,warning:'松土有隆起。埋网、石板和压实土道可以阻挡浅掘。',color:0x9e8b6a},
- quencher:{name:'涎囊兽',day:20,hp:48,speed:15,damage:1.8,interval:2.5,warning:'湿冷黏液会压低中央篝火、暂停全场增益；及时驱赶、投掷打断或清理湿污。',color:0x789a96},
+ quencher:{name:'涎囊兽',day:20,hp:48,speed:15,damage:1.8,interval:2.5,warning:'湿冷黏液会压低中央篝火、暂停全场增益；及时驱赶、重击打断或清理湿污。',color:0x789a96},
  skitter:{name:'裂隙鼠',day:5,hp:12,speed:66,agile:true,damage:1.5,interval:1,warning:'细碎爪印绕着院墙寻找缺口：体型小、跑得极快、生命很低，偏爱破口、低耐久和少人少陷阱的防区。',color:0xc3ab80},
- ...BOSS_SPECIES
+ ...PHASE_CREATURES,...BOSS_SPECIES
 };
 export function enemySpeed(enemy){
  if(enemy.type==='broodmother'&&enemy.bossBrood)return BOSS_FORM_SPEED.brood;

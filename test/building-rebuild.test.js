@@ -34,5 +34,6 @@ test('stable plots migrate through prepare and old-browser settlement but suppli
 test('intruders target an operational rebuilt facility at its stable plot after an earlier slot was removed',()=>{
  let s=yard();s=applyCampaignAction(s,{type:'demolish',id:'old0'});s.flags.centralFire=false;s.people[0].nightRole='sleep';const base=applyCampaignAction(s,{type:'prepare'}),b=createBattle(base,'stable-target',{autoPause:false});b.challenge=null;b.schedule=[{at:9999,type:'walker',zone:'gate'}];b.paused=false;b.rng=500;
  b.enemies=[{id:'e',type:'walker',zone:'gate',x:240,y:475,hp:100,max:100,mode:'inside',attack:0,progress:0,stun:0}];stepBattle(b);const e=b.enemies[0];assert.notEqual(e.targetId,'old0');const target=b.buildings.find(q=>q.id===e.targetId);assert.ok(target);const wrong=PLOTS[b.buildings.indexOf(target)],right=PLOTS[target.plot];assert.ok(Math.hypot(e.targetPoint.x-right.x,e.targetPoint.y-right.y)<55);assert.notDeepEqual(wrong,right);
- for(let i=0;i<1800&&target.hp===10;i++)stepBattle(b);assert.ok(target.hp<10);
+ const startingHp=target.hp;
+ for(let i=0;i<1800&&target.hp===startingHp;i++)stepBattle(b);assert.ok(target.hp<startingHp);
 });

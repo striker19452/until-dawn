@@ -7,7 +7,7 @@ export const PRODUCTION={
  workshop:{normal:2,yield:3,without:1,cost:2,steadyCost:1},
  generator:{normal:{fuel:1,parts:1,water:1,exposure:1},yield:{fuel:2,parts:2,water:2,exposure:2},steady:{fuel:1,parts:1,water:1,exposure:0}},
  infirmary:{normal:3,yield:6,steady:3,steadyFear:4},
- watchtower:{normal:25,yield:45,steady:35,steadyFog:45,fogFactor:.7},
+ watchtower:{normal:25,yield:45,steady:35,steadyFog:45,fogFactor:.7,robotSpeedBonus:.2},
  stove:{normal:1,yield:2,steady:1,fear:6,mengFear:2,steadyFatigue:6},
  exchange:{limit:2,yieldLimit:3,foodCost:3,materials:4,steadyMaterials:5,medicineCost:4,steadyMedicineCost:3,medicine:1,partsCost:1,food:4,water:2,steadyWater:3}
 };
@@ -25,7 +25,8 @@ export const DAY_ACTIONS={
 export const WORK={farm:{skill:2,normal:2,skilled:3},water:3,forage:4,careHealth:7,careFear:6,restHealth:5,restFatigue:22,restFear:8,fatigue:10,repairCost:1,scoutRange:12,scoutExposure:1};
 export const GROWTH={initial:2,step:.08,max:3,story:.5,guard:.07,guardWork:3};
 export const COMBAT={
- strike:{base:7,perSkill:3,stamina:7,minimumStamina:8,progress:3,work:2},
+ heavy:{damage:18,stun:1.2,stamina:18,cooldown:4,afterHit:.6,work:3},
+ strike:{base:7,perSkill:3,stamina:7,minimumStamina:8,work:2},
  repair:{health:23,perSkill:3,seconds:5,skillSpeed:.5,maxSkillSpeed:1.5},
  trap:{max:3,damage:18,stun:2,rammerStun:3},
  brace:{minimumStamina:24,finishStamina:18,cooldown:8,fenceFactor:.45},
@@ -37,7 +38,7 @@ export const COMBAT={
 };
 export const NIGHT_ACTIONS={
  costs:{repair:{materials:1},barricade:{materials:1},addWood:{materials:1},throw:{materials:1},bait:{food:1}},
- times:{barricade:4,fire:4,stoke:2,addWood:4,extinguish:4,throw:2,bait:3,compact:5,clearWet:4,aid:6},
+ times:{heavy:1.2,barricade:4,fire:4,stoke:2,addWood:4,extinguish:4,throw:2,bait:3,compact:5,clearWet:4,aid:6},
  aidKitTime:4,hold:8,houseHealth:20
 };
 export const RECOVERY={morningHealth:4,morningFear:4,workFatigue:.22,maxWorkFatigue:38,nightCalm:8};
@@ -56,7 +57,7 @@ export const nightActionCost=(person,type)=>type==='aid'?{medicine:person.skills
 export const BOSS_RULES={
  exposedFactor:1.5,exposedStun:1.5,
  bastion:{charge:5,armor:.35,afterHit:7,afterCounter:8,braceStun:1},
- brood:{hatch:8,limit:2,interval:16,sealDamage:16,sealStun:2},
+ brood:{hatch:8,interval:16,sealDamage:16,sealStun:2},
  cinder:{siphon:8,armor:.5,drain:2,afterBurst:8,afterCounter:10},
  twin:{splitRatio:.5,window:12,revives:2,splitStun:1}
 };

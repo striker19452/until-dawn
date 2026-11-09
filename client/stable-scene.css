@@ -1,0 +1,47 @@
+/* Keep the courtyard allocation steady while night orders and alerts change. */
+@media(min-width:960px) and (min-height:640px){
+ /* The command panel must consume the spare row, not enlarge an auto row.
+    Otherwise long challenge text plus a move/cancel task can grow every row
+    spanned by the courtyard beyond the window's height. */
+ .shell.night{grid-template-rows:54px 28px 74px auto auto auto auto minmax(0,1fr) 0px 56px}
+ .shell.night>#panel{min-height:0;overflow-y:auto;overscroll-behavior:contain}
+ .shell.night>.world-wrap{height:calc(100dvh - 16px);max-height:calc(100dvh - 16px);min-height:0}
+}
+@media(max-width:959px){
+ .shell.night>#panel{
+  height:clamp(132px,26dvh,200px);max-height:none;min-height:0;
+  align-content:start;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;
+ }
+ .shell.night #panel>.quick-extra{max-height:none;overflow:visible}
+ /* An alert overlays its named scene grid area rather than sizing a new row. */
+ .shell.night>#notice{
+  position:absolute;grid-area:scene;inset:auto 6px 64px;z-index:9;
+  margin:0;max-height:72px;pointer-events:none;
+ }
+ .shell.night #notice .notice{max-height:72px;overflow-y:auto;pointer-events:none}
+ .shell.night #notice .notice.encounter{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center}
+ .shell.night #notice .button{pointer-events:auto;min-height:44px}
+ .shell.night.boss-night>#nightbar{height:56px;overflow-y:auto;overscroll-behavior:contain}
+ .shell.night.boss-night .boss-summary{min-height:44px}
+}
+
+/* Short desktop windows use the same sidebar arrangement as tall desktops. */
+@media(min-width:960px) and (max-height:639px){
+ .shell.night{display:grid;max-width:none;grid-template-columns:minmax(0,1fr) 300px;grid-template-rows:28px 68px auto auto auto minmax(0,1fr) 44px;gap:0;padding:0}
+ .shell.night>.top,.shell.night>.big-action{display:none}
+ .shell.night>.world-wrap{grid-column:1;grid-row:1/-1;margin:0 6px 0 0;min-height:0}
+ .shell.night .world{height:100%;min-height:0}
+ .shell.night>.status{grid-column:2;grid-row:1;height:28px;min-height:28px;padding:0 6px}
+ .shell.night>.stock-summary{grid-column:2;grid-row:2}
+ .shell.night>#nightbar{grid-column:2;grid-row:3}
+ .shell.night>.crew-hud{grid-column:2;grid-row:4;margin:4px 6px 0}
+ .shell.night>.zone-list{grid-column:2;grid-row:5;margin:4px 6px 0}
+ .shell.night>#panel{grid-column:2;grid-row:6;margin:4px 6px;min-height:0;overflow-y:auto;overscroll-behavior:contain}
+ .shell.night>.nav{grid-column:2;grid-row:7;height:44px;min-height:44px;margin:0;padding:0}
+ .shell.night>.nav button{min-height:40px}
+ .shell.night>#notice{position:absolute;grid-column:1;grid-row:1/-1;inset:auto 12px 64px 6px;z-index:9;margin:0;pointer-events:none}
+ .shell.night>#notice[data-routine=true]{display:none}
+ .shell.night #notice .notice{max-height:72px;overflow-y:auto;pointer-events:none}
+ .shell.night #notice .notice.encounter{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center}
+ .shell.night #notice .button{pointer-events:auto;min-height:44px}
+}

@@ -30,7 +30,7 @@ test('challenge earns a concrete reward only on success and seen species persist
 });
 
 test('challenge warning pauses before the encounter and pause freezes all timers',()=>{
- const s=action(day(9),{type:'prepare'});s.flags.seenTypes=['walker','climber','rammer'];const b=createBattle(s,'warning');battleCommand(b,{type:'resume'});for(let i=0;i<400&&!b.paused;i++)stepBattle(b);assert.match(b.reason,/挑战预警/);assert.ok(b.elapsed<24);const frozen=structuredClone(b);advance(b,2);assert.deepEqual(b,frozen);
+ const s=action(day(9),{type:'prepare'});s.flags.seenTypes=Object.keys(ENEMIES);const b=createBattle(s,'warning');battleCommand(b,{type:'resume'});for(let i=0;i<400&&!b.paused;i++)stepBattle(b);assert.match(b.reason,/挑战预警/);assert.ok(b.elapsed<24);const frozen=structuredClone(b);advance(b,2);assert.deepEqual(b,frozen);
 });
 
 test('six previously inert building upgrades now change production, consumption or warning',()=>{
@@ -56,7 +56,7 @@ test('inside damage is continuous, stacks, and sleeping characters remain vulner
 
 test('lure continuously attracts later arrivals once each; compaction persists for the night',()=>{
  const b=fixture(16),p=b.people[0];p.x=240;p.y=456.25;battleCommand(b,{type:'bait',person:p.id,target:'gate'});advance(b,3.1);assert.equal(b.lures.length,1);const e={...enemy('walker','right'),x:300,y:450,mode:'approach'};b.enemies=[e];stepBattle(b);assert.equal(e.zone,'gate');assert.equal(b.lures[0].affected.length,1);e.zone='right';stepBattle(b);assert.equal(e.zone,'right');advance(b,12);assert.equal(b.lures.length,0);
- const c=fixture(16),q=c.people[0],z=ZONES[3];q.x=z.x+(240-z.x)*.15;q.y=z.y+(350-z.y)*.15;battleCommand(c,{type:'compact',person:q.id,target:'backLeft'});advance(c,5.1);assert.equal(c.zones[3].compacted,true);c.enemies=[enemy('burrower','backLeft')];advance(c,14.1);assert.equal(c.enemies[0].mode,'attack');assert.ok(c.enemies[0].progress<6);
+ const c=fixture(16),q=c.people[0],z=ZONES[3];q.x=z.x+(240-z.x)*.15;q.y=z.y+(350-z.y)*.15;battleCommand(c,{type:'compact',person:q.id,target:'backLeft'});advance(c,5.1);assert.equal(c.zones[3].compacted,true);c.enemies=[enemy('burrower','backLeft')];advance(c,8.5);assert.equal(c.enemies[0].mode,'attack');assert.ok(c.enemies[0].progress<3);advance(c,.1);assert.equal(c.enemies[0].mode,'inside');
 });
 
 test('shelter halves spray damage and wet duration, and clearWet restores the fire effect',()=>{

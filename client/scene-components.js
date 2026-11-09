@@ -2,7 +2,7 @@ import {formatDurability} from '../src/format.js';
 import { BUILDINGS,ZONES } from '../src/content.js';
 import { HOUSE_ANCHOR } from '../src/yard-geometry.js';
 import { yardFires } from '../src/campfire.js';
-import {buildingHealth,BUILDING_MAX_HP,buildingPlot} from '../src/building-health.js';
+import {buildingHealth,buildingMaxHealth,buildingPlot} from '../src/building-health.js';
 import {buildingStateFrame,buildingStateRegistration,registerBuildingStateFrames} from './building-art.js';
 import { CampfireComponent,registerCampfireFrames } from './campfire-art.js';
 import { DefenseComponent,DEFENSE_KINDS,defenseLayout,defenseSignal } from './defense-art.js';
@@ -55,9 +55,9 @@ class YardComponent{
   // Physical damage and ruins use sixteen dedicated painted sprites. The
   // graphics layer only owns the shared UI, never a substitute rubble icon.
   if(r.attacked){g.lineStyle(2.5,0xf59973,.95);g.strokeEllipse(0,-5,75,33);}
-  g.fillStyle(0x242e30,.95);g.fillRoundedRect(-27,5,54,6,2);g.fillStyle(ruined?0xb66559:color,1);g.fillRoundedRect(-26,6,52*r.hp/BUILDING_MAX_HP,4,1);
+  g.fillStyle(0x242e30,.95);g.fillRoundedRect(-27,5,54,6,2);g.fillStyle(ruined?0xb66559:color,1);g.fillRoundedRect(-26,6,52*r.hp/buildingMaxHealth(r.kind),4,1);
   if(!this.healthLabel){this.healthLabel=this.scene.add.text(0,15,'',{fontFamily:'PingFang SC, sans-serif',fontSize:'12px',color:'#fff0d0',backgroundColor:'#253033e8',padding:{x:3,y:2}}).setOrigin(.5,0);this.root.add(this.healthLabel);}
-  this.healthLabel.setText(`${BUILDINGS[r.kind].name} ${formatDurability(r.hp)}/${BUILDING_MAX_HP}${ruined?' · 损毁':''}`);
+  this.healthLabel.setText(`${BUILDINGS[r.kind].name} ${formatDurability(r.hp)}/${buildingMaxHealth(r.kind)}${ruined?' · 损毁':''}`);
  }
  inspect(){return {id:this.id,kind:this.data.kind,zone:this.data.zone,state:this.data.state,frame:this.data.frame,texture:this.data.texture,plot:this.data.plot,depth:this.root.depth,impact:this.data.impact||null,projection:this.data.projection||null,uv:this.sprite?.type==='Mesh2D'?Array.from({length:4},(_,i)=>({x:this.sprite.vertices[i*4+2],y:this.sprite.vertices[i*4+3]})):null,renderer:this.sprite?.type,quad:this.sprite?.type==='Mesh2D'?Array.from({length:4},(_,i)=>({x:this.root.x+this.sprite.vertices[i*4]*this.sprite.scaleX,y:this.root.y+this.sprite.vertices[i*4+1]*this.sprite.scaleY})):null,hp:this.data.hp,occludes:!!this.data.occludes,bounds:this.bounds};}
  paintOcclusion(ctx,point){
@@ -92,7 +92,7 @@ export function createSceneComponents(scene){
    if(z.compacted)records.push({id:'compacted-'+z.id,kind:'compacted',zone:z.id,x:p.x,y:p.y+22,depth:p.y+5,night});
    for(let i=0;i<(z.hp>0?z.traps:0);i++){const offset=(i-1)*22;records.push({id:'trap-'+z.id+'-'+i,kind:'trap',zone:z.id,x:layout.traps.x+layout.along.x*offset,y:layout.traps.y+layout.along.y*offset,depth:layout.traps.y+layout.along.y*offset+2,along:layout.along,inward:layout.inward,index:i,night});}
   }
-  for(const [i,b] of campaign.buildings.entries()){const plot=buildingPlot(b,i),p=artPoint(PLOTS[plot]),hp=buildingHealth(battle?.buildings?.find(q=>q.id===b.id)||b),state=hp===0?'destroyed':hp<BUILDING_MAX_HP?'damaged':'intact';records.push({id:'building-'+b.id,kind:b.type,plot,x:p.x,y:p.y,depth:p.y,texture:state==='intact'?'buildings':'building-states',frame:buildingStateFrame(b.type,state)??BUILD_IDS.indexOf(b.type),size:b.type==='watchtower'?128:114,hp,state,attacked:!!battle?.enemies.some(e=>e.mode==='inside'&&e.targetId===b.id&&e.attackTarget?.kind!=='person'),occludes:hp>0,night});}
+  for(const [i,b] of campaign.buildings.entries()){const plot=buildingPlot(b,i),p=artPoint(PLOTS[plot]),hp=buildingHealth(battle?.buildings?.find(q=>q.id===b.id)||b),state=hp===0?'destroyed':hp<buildingMaxHealth(b.type)?'damaged':'intact';records.push({id:'building-'+b.id,kind:b.type,plot,x:p.x,y:p.y,depth:p.y,texture:state==='intact'?'buildings':'building-states',frame:buildingStateFrame(b.type,state)??BUILD_IDS.indexOf(b.type),size:b.type==='watchtower'?128:114,hp,state,attacked:!!battle?.enemies.some(e=>e.mode==='inside'&&e.targetId===b.id&&e.attackTarget?.kind!=='person'),occludes:hp>0,night});}
   for(const f of yardFires(campaign,battle)){const p=artPoint(f);records.push({id:'fire-central',kind:'fire',zone:'central',x:p.x,y:p.y,depth:p.y,heat:f.heat,wet:f.wet,night});}
   const used=new Set();for(const r of records){
    if(r.texture){const id=r.zone||r.id.replace(/^building-/,''),impact=latestStructureImpact(battle,id,t,reduced);if(impact){r.impact={age:impact.age,shake:impact.shake,flash:impact.flash};r.x+=impact.shake;r.y+=impact.shake*.35;}}

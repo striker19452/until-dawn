@@ -7,6 +7,7 @@ import {bossDamage,bossStatus} from '../src/bosses.js';
 import {ENEMIES,ZONES,enemyTypes,dailyIntel} from '../src/content.js';
 import {validateClientResult} from '../src/client-result.js';
 import {leaveHouse} from '../src/shelter.js';
+import {BOSS_RULES} from '../src/balance.js';
 const advance=(b,n)=>{for(let i=0;i<Math.ceil(n*20)&&!b.finished;i++)stepBattle(b);};
 function fixture(day){let state=applyCampaignAction(initialCampaign(53),{type:'chooseRole',role:'repairman'});state.day=day;state.resources.materials=100;state.flags.centralFire=false;state.zones.forEach(z=>z.hp=100);state.people[0].nightRole='sleep';state=applyCampaignAction(state,{type:'prepare'});const b=createBattle(state,'boss-test',{autoPause:false}),def=BOSSES[day];b.schedule=[{at:.05,type:def.id,zone:b.boss.zone,challenge:true}];b.paused=false;stepBattle(b);const e=b.enemies.find(e=>e.boss),z=ZONES.find(z=>z.id===e.zone);Object.assign(e,{x:z.x,y:z.y,mode:'attack'});return {b,e,state};}
 function actor(b,point){const p=b.people[0];leaveHouse(b,p);Object.assign(p,{x:point.x,y:point.y,nightRole:'guard',cooldown:0,fear:0});return p;}
@@ -26,8 +27,36 @@ test('actual throwing interrupts a charge, consumes one material, and pausing fr
 test('brood mounds can be sealed with mesh or a real compaction task, causing sixteen damage',()=>{
  for(const method of ['mesh','compact']){const {b,e}=fixture(14);advance(b,.05);assert.equal(b.boss.mounds.length,1);if(method==='mesh')b.zones[3].mesh=true;else{const p=actor(b,inner(ZONES[3]));battleCommand(b,{type:'compact',person:p.id,target:'backLeft'});}advance(b,method==='mesh'?.05:5.1);assert.equal(b.boss.sealed,1);assert.equal(b.boss.summons,0);assert.ok(b.enemies.find(q=>q.id===e.id).hp<=242);assert.ok(b.events.some(e=>e.type==='boss-break'&&e.damage===16));}
 });
-test('unsealed brood nests create real inside offspring and never exceed the two-child budget',()=>{
- const {b}=fixture(14);let count=0;for(let i=0;i<1600;i++){stepBattle(b);for(const child of b.enemies.filter(e=>e.bossBrood)){assert.equal(child.type,'broodmother');assert.equal(child.mode,'inside');assert.ok(!child.boss);assert.equal(child.max,42);assert.equal(child.hp,42);count++;}b.enemies=b.enemies.filter(e=>!e.bossBrood);}assert.equal(count,2);assert.equal(b.boss.summons,2);assert.equal(b.boss.entityIds.length,1);
+test('a living broodmother keeps producing real offspring beyond two, even after entering the yard',()=>{
+ const {b}=fixture(14);let count=0;for(let i=0;i<1600;i++){stepBattle(b);for(const child of b.enemies.filter(e=>e.bossBrood)){assert.equal(child.type,'broodmother');assert.equal(child.mode,'inside');assert.ok(!child.boss);assert.equal(child.max,42);assert.equal(child.hp,42);count++;}b.enemies=b.enemies.filter(e=>!e.bossBrood);}assert.equal(count,5);assert.equal(b.boss.summons,5);assert.equal(b.enemies.find(e=>e.boss).mode,'inside');assert.equal(b.boss.entityIds.length,1);
+});
+test('broodmother laying follows its life clock during approach, inside combat and stun, and pauses with the battle',()=>{
+ for(const mode of ['approach','inside']){
+  const {b,e}=fixture(14);e.mode=mode;e.stun=100;
+  const zones=[];let previous=0;
+  for(let i=0;i<800;i++){
+   stepBattle(b);if(b.boss.moundSeq!==previous){zones.push(b.boss.moundSeq%2?'backLeft':'backRight');previous=b.boss.moundSeq;}
+   b.enemies=b.enemies.filter(e=>!e.bossBrood);
+  }
+  // The first mound was laid as soon as the mother appeared, before contact.
+  assert.equal(b.boss.moundSeq,3);assert.deepEqual(zones,['backLeft','backRight','backLeft']);assert.equal(b.boss.summons,3);assert.equal(e.mode,mode);assert.ok(e.stun>0);
+  battleCommand(b,{type:'pause'});const frozen=structuredClone(b);advance(b,20);assert.deepEqual(b,frozen);
+ }
+});
+test('sealed nests do not stop subsequent laying; killing the mother clears pending eggs but keeps hatched offspring',()=>{
+ const sealed=fixture(14);sealed.b.zones[3].mesh=true;sealed.b.zones[4].mesh=true;sealed.e.stun=100;
+ advance(sealed.b,BOSS_RULES.brood.interval*2+.1);assert.equal(sealed.b.boss.sealed,3);assert.equal(sealed.b.boss.summons,0);assert.equal(sealed.e.hp,BOSSES[14].hp-3*BOSS_RULES.brood.sealDamage);
+ const {b,e}=fixture(14);advance(b,16.1);assert.equal(b.boss.summons,1);assert.equal(b.boss.mounds.length,1);
+ e.hp=0;stepBattle(b);assert.equal(b.boss.defeated,true);assert.equal(b.boss.mounds.length,0);assert.equal(b.finished,false);
+ advance(b,20);assert.equal(b.boss.summons,1);assert.equal(b.boss.moundSeq,2);assert.equal(b.enemies.filter(e=>e.bossBrood).length,1);
+ assert.ok(b.enemies.some(e=>e.type==='shellcrab'),'the boss follower is a separate live threat');for(const e of b.enemies)e.hp=0;stepBattle(b);assert.equal(b.finished,true);
+});
+test('continuous brood counts remain saveable above two and reject invalid counters',()=>{
+ const {b,e,state}=fixture(14);state.flags.seenTypes=Object.keys(ENEMIES);b.seen=Object.keys(ENEMIES);
+ for(let i=0;i<1600;i++){stepBattle(b);b.enemies=b.enemies.filter(e=>!e.bossBrood);}
+ assert.equal(b.boss.summons,5);e.hp=0;stepBattle(b);const result=settleNight(state,b);
+ assert.equal(validateClientResult(state,result),result);assert.equal(result.report.boss.summons,5);
+ for(const summons of [-1,1.5,Infinity,Number.MAX_SAFE_INTEGER+1]){const invalid=structuredClone(result);invalid.report.boss.summons=summons;assert.throws(()=>validateClientResult(state,invalid),/首领机制记录/);}
 });
 test('cinder siphon spends heat rather than fuel, actual extinguishing interrupts and exposes it',()=>{
  const {b,e}=fixture(21);b.fires=[{id:'central',x:240,y:390,heat:60,wood:1,wet:0,enabled:true,shade:true}];advance(b,1);assert.equal(b.boss.phase,'siphon');assert.equal(bossDamage(b,e,10,'strike'),5);assert.ok(Math.abs(b.fires[0].wood-(1-.006))<1e-8);assert.ok(Math.abs(b.fires[0].heat-(60-(b.weather==='rain'?2.65:2.36)))<1e-7);const p=actor(b,b.fires[0]);battleCommand(b,{type:'extinguish',person:p.id,target:'central'});advance(b,4.5);assert.equal(b.fires[0].heat,0);assert.equal(b.boss.phase,'exposed');assert.ok(b.events.some(e=>e.text.includes('火源切断')));assert.equal(bossDamage(b,e,10,'strike'),15);

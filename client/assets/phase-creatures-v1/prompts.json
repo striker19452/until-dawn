@@ -1,0 +1,4 @@
+{
+  "tool": "built-in image_gen.imagegen",
+  "prompt": "A transparent PNG game sprite atlas, square canvas with exactly four isolated creatures in a precise 2x2 layout, one animal centered in each quadrant with generous empty margin. Hand-painted gouache post-apocalyptic fantasy, seen from slightly above facing right. No labels or scenery. Top left: a lean ochre six-legged lizard-insect with long scythe hindlegs and green frill. Top right: a wide rust-brown armored crab/woodlouse with split shell, glowing amber seams and large pincers. Bottom left: a squat moss-purple toad with lavender translucent spore sacs on its back. Bottom right: a tall pale teal praying mantis with two large leaf-shaped resonator plates on back and gold eyes. Four completely different silhouettes, full bodies and feet visible, dark outlines, restrained earthy colors, readable at small size. True transparency, no checkerboard, text, frames, ground, shadows, extra creatures, or borders."
+}

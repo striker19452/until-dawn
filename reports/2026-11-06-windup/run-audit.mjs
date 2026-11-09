@@ -1,0 +1,12 @@
+import {writeFileSync} from 'node:fs';
+import {pathToFileURL} from 'node:url';
+const [root,out,label]=process.argv.slice(2);
+const {tacticalNight}=await import(pathToFileURL(`${root}/test/support/tactical-night.js`));
+const rows=[];
+for(const seed of [11,53,97])for(let day=1;day<=28;day++)for(const policy of ['prepared','stacked','random'])rows.push(tacticalNight({day,seed,policy}));
+const fatigue=[];
+for(const seed of [11,53,97])for(const day of [5,8,12,13,16,17,18,20,22,24,25,27])for(const value of [0,90])fatigue.push(tacticalNight({day,seed,fatigue:value}));
+const careers=rows.filter(r=>r.policy==='prepared');
+for(const role of ['repairman','medic'])for(const seed of [11,53,97])for(let day=1;day<=28;day++)careers.push(tacticalNight({day,seed,role}));
+writeFileSync(out,JSON.stringify({label,rows,fatigue,careers},null,2));
+console.log(label,JSON.stringify(Object.fromEntries(['prepared','stacked','random'].map(p=>[p,rows.filter(r=>r.policy===p&&r.cleared).length]))));

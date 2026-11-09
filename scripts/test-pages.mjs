@@ -7,7 +7,7 @@ import {chromium,expect} from '@playwright/test';
 // Serve only the production files under the same subpath as GitHub Pages.
 // No API, Vite fallback or Node game server can hide deployment problems.
 const root=resolve('dist'),prefix='/until-dawn/';
-const mime={'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json','.webp':'image/webp','.png':'image/png','.wav':'audio/wav'};
+const mime={'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json','.webp':'image/webp','.png':'image/png','.wav':'audio/wav','.mp4':'video/mp4'};
 let server,browser;
 try{
  let url=process.env.PAGES_URL;

@@ -1,0 +1,37 @@
+import {test,expect} from '@playwright/test';
+import {mkdirSync} from 'node:fs';
+import {installStorage,seedSave} from './support/storage.js';
+import {createTestSession} from '../src/test-mode.js';
+import {createBattle} from '../src/battle.js';
+mkdirSync('.local/objective-notice',{recursive:true});
+for(const [width,height] of [[320,568],[390,844],[1280,900]])test(`night two exposes requirements and irreversible failures at ${width}px`,async({page})=>{
+ await page.setViewportSize({width,height});const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ const state=createTestSession({day:2}).snapshot.state,b=createBattle(state,'objective-test',{autoPause:false});
+ const publish=()=>page.evaluate(b=>window.__objectiveWorker.dispatchEvent(new MessageEvent('message',{data:{type:'state',battle:b,result:null,steps:0}})),b);
+ await page.exposeFunction('__objectiveMessage',async m=>{if(m.type==='init')await publish();});
+ await page.addInitScript(()=>{const Native=window.Worker;window.Worker=class extends EventTarget{constructor(url,options){super();if(!String(url).includes('night-worker'))return new Native(url,options);window.__objectiveWorker=this;queueMicrotask(()=>this.dispatchEvent(new MessageEvent('message',{data:{type:'ready'}})));}postMessage(m){window.__objectiveMessage(m);}terminate(){}};});
+ await installStorage(page);await seedSave(page,{state,runId:'objective-test',revision:1});await page.goto('/');await expect(page.locator('#world')).toHaveAttribute('data-ready','true');
+ const notice=page.getByTestId('objective-notice');await expect(notice).toBeVisible();await expect(notice).toContainText('各至少55耐久');await expect(notice).toContainText('无人死亡');
+ await page.screenshot({path:`.local/objective-notice/requirements-2-${width}.png`,fullPage:true});
+ await page.locator('[data-action=start-night]').click();await expect(page.locator('#phase')).toContainText('实时守夜');
+ b.zones.find(z=>z.id==='left').hp=51;await publish();await expect(notice).toContainText('左栏耐久51');await expect(notice).toContainText('还差4');
+ b.zones.find(z=>z.id==='left').hp=70;b.challenge.broken=['right'];await publish();await expect(notice).toContainText('本夜目标已无法完成');await expect(notice).toContainText('右栏曾被打穿');
+ expect(await notice.evaluate(el=>el.scrollWidth<=el.clientWidth+1)).toBe(true);await page.screenshot({path:`.local/objective-notice/failed-${width}.png`,fullPage:true});
+ await notice.getByRole('button').click();await expect(page.getByTestId('night-challenge')).toBeVisible();expect(errors).toEqual([]);
+});
+for(const [width,height] of [[320,568],[390,844],[1280,900]])test(`night three shows mandatory conditions before optional advice at ${width}px`,async({page})=>{
+ await page.setViewportSize({width,height});const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ const state=createTestSession({day:3}).dawn;await installStorage(page);await seedSave(page,{state,runId:'third-night-rules',revision:1});await page.goto('/');
+ await expect(page.locator('#world')).toHaveAttribute('data-ready','true');
+ const notice=page.getByTestId('objective-notice');await expect(notice).toBeVisible();await expect(notice.locator('li')).toHaveCount(3);
+ await expect(notice).toContainText('后左栏 · 攀爬者');await expect(notice).toContainText('入院即失败，之后击退也不算');await expect(notice).toContainText('无人死亡');await expect(notice).toContainText('不是撑满固定时间');await expect(notice).not.toContainText('6秒');
+ expect(await notice.evaluate(el=>el.scrollWidth<=el.clientWidth+1)).toBe(true);
+ await page.screenshot({path:`.local/objective-notice/requirements-3-${width}.png`,fullPage:true});
+ await notice.getByRole('button').click();const card=page.getByTestId('night-challenge');
+ await expect(card.getByTestId('challenge-conditions')).toContainText('以下必须全部满足');await expect(card.getByTestId('tactical-advice')).toContainText('到达后左栏后，基础翻越耗时6秒');
+ expect(await card.evaluate(el=>el.querySelector('[data-testid=challenge-conditions]').compareDocumentPosition(el.querySelector('[data-testid=tactical-advice]'))&Node.DOCUMENT_POSITION_FOLLOWING)).toBeTruthy();
+ await page.screenshot({path:`.local/objective-notice/details-3-${width}.png`,fullPage:true});
+ await page.locator('[data-action=close-overlay]').click();await page.locator('[data-action=prepare]').click();await expect(page.locator('#phase')).toHaveText('黄昏准备');
+ await expect(notice).toContainText('入院即失败，之后击退也不算');
+ await page.locator('[data-action=start-night]').click();await expect(page.locator('#phase')).toContainText('实时守夜');await expect(notice).toContainText('入院即失败，之后击退也不算');expect(errors).toEqual([]);
+});

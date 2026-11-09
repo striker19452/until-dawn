@@ -4,7 +4,7 @@ import {PLOTS} from './yard-geometry.js';
 import {nearestWalkablePoint,moveToward} from './movement.js';
 import {HOUSE_DOOR} from './shelter.js';
 import {formatDurability} from './format.js';
-import {buildingHealth,buildingOperational,buildingPlot} from './building-health.js';
+import {buildingHealth,buildingOperational,buildingPlot,upgradedWatchtower} from './building-health.js';
 import {enemyDamageFeedback} from './enemy-damage.js';
 
 // Choose once and keep the destination until destroyed. All random draws use
@@ -16,7 +16,7 @@ export function intrusionStep(b,e,dt,speed,factor,random,emit,note){
  if(!target){
   const reachable=candidates.map(t=>({...t,point:nearestWalkablePoint(t.point,b.walkMap,e)})).filter(t=>t.point);
   if(!reachable.length)return;
-  target=reachable[Math.min(reachable.length-1,Math.floor(random()*reachable.length))];
+  target=reachable.find(t=>upgradedWatchtower(t.building))||reachable[Math.min(reachable.length-1,Math.floor(random()*reachable.length))];
   e.targetId=target.id;e.targetName=target.name;e.targetPoint=target.point;delete e.lastHit;
   note(`${e.targetName}被${e.typeName}盯上了。`);
  }

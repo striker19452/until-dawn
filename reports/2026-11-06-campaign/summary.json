@@ -1,0 +1,234 @@
+{
+  "before": {
+    "attempts": 90,
+    "rescued": 0,
+    "earliestStop": 2,
+    "latestStop": 9,
+    "completedNights": 402,
+    "stopDays": {
+      "3": 2,
+      "8": 18,
+      "9": 8,
+      "2": 40,
+      "5": 12,
+      "4": 10
+    }
+  },
+  "after": {
+    "attempts": 90,
+    "rescued": 0,
+    "earliestStop": 2,
+    "latestStop": 8,
+    "completedNights": 396,
+    "stopDays": {
+      "3": 2,
+      "8": 24,
+      "2": 40,
+      "5": 14,
+      "4": 6,
+      "6": 4
+    }
+  },
+  "adaptive-before": {
+    "attempts": 36,
+    "rescued": 0,
+    "earliestStop": 9,
+    "latestStop": 13,
+    "completedNights": 378,
+    "stopDays": {
+      "9": 8,
+      "12": 10,
+      "10": 16,
+      "13": 2
+    }
+  },
+  "adaptive-after": {
+    "attempts": 36,
+    "rescued": 0,
+    "earliestStop": 8,
+    "latestStop": 12,
+    "completedNights": 348,
+    "stopDays": {
+      "9": 20,
+      "10": 8,
+      "12": 6,
+      "8": 2
+    }
+  },
+  "example": {
+    "role": "watchman",
+    "seed": 97,
+    "size": 5,
+    "foodActuallyUsed": 115,
+    "waterActuallyUsed": 49,
+    "hungryDays": [
+      5,
+      6,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "resources": {
+      "food": 0,
+      "water": 42,
+      "materials": 19,
+      "fuel": 31,
+      "medicine": 0,
+      "parts": 22
+    },
+    "people": [
+      {
+        "id": "hero",
+        "name": "你",
+        "role": "夜班保安",
+        "health": 65.937,
+        "hunger": true,
+        "thirst": false,
+        "fear": 0,
+        "fatigue": 98.27900000000002,
+        "stamina": 120,
+        "wound": "recovering",
+        "deadline": null,
+        "extended": false,
+        "dead": false,
+        "skills": {
+          "survival": 0,
+          "engineering": 0.32,
+          "guard": 2.839999999999998,
+          "exploration": 1.36,
+          "medical": 0
+        },
+        "job": "rest",
+        "nightRole": "guard",
+        "zone": "left",
+        "reserved": {},
+        "story": 0,
+        "joinedDay": 1,
+        "workedDay": 12,
+        "nightDutyDay": 12
+      },
+      {
+        "id": "lin",
+        "name": "林禾",
+        "role": "园艺师",
+        "health": 27.839999999999918,
+        "hunger": true,
+        "thirst": false,
+        "fear": 0,
+        "fatigue": 21.834000000000106,
+        "stamina": 105,
+        "wound": "none",
+        "deadline": null,
+        "extended": false,
+        "dead": false,
+        "skills": {
+          "survival": 2.960000000000001,
+          "engineering": 0,
+          "guard": 0.8400000000000003,
+          "exploration": 0,
+          "medical": 0
+        },
+        "job": "farm",
+        "nightRole": "guard",
+        "zone": "gate",
+        "reserved": {},
+        "story": 1,
+        "joinedDay": 1,
+        "workedDay": 12,
+        "nightDutyDay": 12
+      },
+      {
+        "id": "zhou",
+        "name": "老周",
+        "role": "维修师傅",
+        "health": 30,
+        "hunger": true,
+        "thirst": false,
+        "fear": 0,
+        "fatigue": 7.52,
+        "stamina": 85,
+        "wound": "none",
+        "deadline": null,
+        "extended": false,
+        "dead": false,
+        "skills": {
+          "survival": 0.7999999999999999,
+          "engineering": 2,
+          "guard": 0.7000000000000002,
+          "exploration": 0,
+          "medical": 0
+        },
+        "job": "water",
+        "nightRole": "guard",
+        "zone": "right",
+        "reserved": {},
+        "story": 1,
+        "joinedDay": 3,
+        "workedDay": 12,
+        "nightDutyDay": 12
+      },
+      {
+        "id": "chen",
+        "name": "陈岚",
+        "role": "实习警察",
+        "health": 30,
+        "hunger": true,
+        "thirst": false,
+        "fear": 0,
+        "fatigue": 11.811000000000014,
+        "stamina": 115,
+        "wound": "none",
+        "deadline": null,
+        "extended": false,
+        "dead": false,
+        "skills": {
+          "survival": 0.64,
+          "engineering": 0,
+          "guard": 2.2799999999999994,
+          "exploration": 0,
+          "medical": 0
+        },
+        "job": "farm",
+        "nightRole": "guard",
+        "zone": "backLeft",
+        "reserved": {},
+        "story": 1,
+        "joinedDay": 5,
+        "workedDay": 12,
+        "nightDutyDay": 12
+      },
+      {
+        "id": "xu",
+        "name": "许宁",
+        "role": "社区护士",
+        "health": 50,
+        "hunger": true,
+        "thirst": false,
+        "fear": 0,
+        "fatigue": 11.590000000000032,
+        "stamina": 95,
+        "wound": "none",
+        "deadline": null,
+        "extended": false,
+        "dead": false,
+        "skills": {
+          "survival": 0.4,
+          "engineering": 0,
+          "guard": 0.35000000000000003,
+          "exploration": 0,
+          "medical": 2
+        },
+        "job": "water",
+        "nightRole": "guard",
+        "zone": "backRight",
+        "reserved": {},
+        "story": 1,
+        "joinedDay": 8,
+        "workedDay": 12,
+        "nightDutyDay": 12
+      }
+    ]
+  }
+}

@@ -1,17 +1,59 @@
 import {selectZone} from './support/ui.js';
 import {test,expect} from '@playwright/test';
 import {randomUUID} from 'node:crypto';
+import {writeFileSync} from 'node:fs';
 import {initialCampaign,applyCampaignAction} from '../src/campaign.js';
 import {artPoint,worldPoint} from '../client/scene-layout.js';
 import {nearestWalkablePoint,walkablePoint} from '../src/movement.js';
 import {HOUSE_ANCHOR} from '../src/yard-geometry.js';
+import {installStorage,seedSave,readSave,browserSave} from './support/storage.js';
 const diagnostics=page=>page.locator('canvas').evaluate(c=>c.getYardDiagnostics());
 const snapshot=page=>page.locator('#world').evaluate(el=>el.getNightSnapshot());
 function state(night=false){let s=applyCampaignAction(initialCampaign(53),{type:'chooseRole',role:'repairman'});s=applyCampaignAction(s,{type:'recruit',person:'lin'});s=applyCampaignAction(s,{type:'nightRole',person:'hero',role:'guard',zone:'left'});s=applyCampaignAction(s,{type:'nightRole',person:'lin',role:'guard',zone:'right'});return night?applyCampaignAction(s,{type:'prepare'}):s;}
-async function boot(page,night=false){const s=state(night);await page.route('**/api/campaign',route=>route.fulfill({json:{state:s,runId:randomUUID(),revision:1}}));await page.goto('/');await expect(page.locator('#world')).toHaveAttribute('data-ready','true');if(night){await page.locator('[data-action=start-night]').click();await expect.poll(async()=>!!await snapshot(page)).toBe(true);await expect(page.locator('[data-action=pause]')).toHaveText('继续');}return s;}
+async function boot(page,night=false){const s=state(night);await installStorage(page);await seedSave(page,{state:s,runId:randomUUID(),revision:1});await page.goto('/');await expect(page.locator('#world')).toHaveAttribute('data-ready','true');if(night){await page.locator('[data-action=start-night]').click();await expect.poll(async()=>!!await snapshot(page)).toBe(true);await expect(page.locator('[data-action=pause]')).toHaveText('继续');}return s;}
 async function clickArt(page,p,touch=false){const {metrics}=await diagnostics(page),box=await page.locator('canvas').boundingBox(),x=box.x+box.width/2+(p.x-240)*metrics.cssScale,y=box.y+box.height/2+(p.y-metrics.centerY)*metrics.cssScale;if(touch)await page.touchscreen.tap(x,y);else await page.mouse.click(x,y);}
 async function select(page,id,touch=false){const d=await diagnostics(page),p=d.tokens.find(t=>t.id==='p-'+id),body=p.bodyBounds;await clickArt(page,{x:body.left+body.width*.5,y:body.top+body.height*.55},touch);await expect.poll(async()=>(await diagnostics(page)).movement.actor).toBe(id);await expect.poll(async()=>(await diagnostics(page)).movement.armed).toBe(true);await expect.poll(async()=>(await diagnostics(page)).tokens.find(t=>t.id==='p-'+id).highlighted).toBe(true);}
 async function inOneScreen(page){const b=await page.evaluate(()=>({w:innerWidth,h:innerHeight,sw:document.documentElement.scrollWidth,sh:document.documentElement.scrollHeight}));expect(b.sw).toBeLessThanOrEqual(b.w);expect(b.sh).toBeLessThanOrEqual(b.h+1);}
+
+for(const [width,height,ratio,night]of [[390,844,3,false],[390,844,3,true],[320,568,2,true],[1280,900,2,true],[1280,600,1,true]])test(`actual canvas selection and movement preserve camera and background at ${width}x${height}, DPR ${ratio}, ${night?'night':'day'}`,async({browser},testInfo)=>{
+ const context=await browser.newContext({viewport:{width,height},deviceScaleFactor:ratio,isMobile:width<600,hasTouch:width<600}),page=await context.newPage();
+ await boot(page,night);
+ await expect.poll(async()=>{const d=await diagnostics(page);return Math.abs(d.camera.cssHeight-d.metrics.height);}).toBeLessThan(1);
+ await page.evaluate(()=>{
+  window.__moveViewSamples=[];
+  window.__moveViewTimer=setInterval(()=>{const c=document.querySelector('canvas'),d=c.getYardDiagnostics(),r=document.querySelector('#world').getBoundingClientRect(),a=document.querySelector('.yard-art').getBoundingClientRect();
+   window.__moveViewSamples.push({time:performance.now(),world:[r.x,r.y,r.width,r.height],art:[a.x,a.y,a.width,a.height],scale:d.metrics.cssScale,effectiveZoom:d.camera.zoom*d.camera.cssWidth/d.camera.bufferWidth,quality:d.qualityRatio,camera:d.camera,armed:d.movement.armed});
+  },40);
+ });
+ await page.waitForTimeout(150);await select(page,'lin',width<600);await page.waitForTimeout(150);await clickArt(page,artPoint({x:350,y:410}),width<600);
+ if(night)await page.locator('[data-action=pause]').filter({visible:true}).first().click();
+ await expect.poll(async()=>{const d=await diagnostics(page);return d.tokens.find(p=>p.id==='p-lin')?.moving;}).toBe(true);
+ await page.waitForTimeout(4500);
+ const samples=await page.evaluate(()=>{clearInterval(window.__moveViewTimer);return window.__moveViewSamples;});
+ await testInfo.attach('camera-samples',{body:JSON.stringify(samples,null,2),contentType:'application/json'});
+ const first=samples[0];
+ for(const sample of samples){
+  expect(sample.world.map((v,i)=>Math.abs(v-first.world[i])).every(v=>v<1),JSON.stringify({first,sample})).toBe(true);
+  expect(sample.art.map((v,i)=>Math.abs(v-first.art[i])).every(v=>v<1),JSON.stringify({first,sample})).toBe(true);
+  expect(sample.effectiveZoom,JSON.stringify({first,sample})).toBeCloseTo(first.effectiveZoom,3);
+ }
+ await page.screenshot({path:`.local/move-zoom-${width}-${night}.png`});await context.close();
+});
+
+for(const [width,height,ratio]of [[1280,800,2],[1100,700,2],[900,650,2]])test(`day 22 medic crew: clicking a person then ground keeps actual rendered scale at ${width}x${height}`,async({browser},testInfo)=>{
+ const context=await browser.newContext({viewport:{width,height},deviceScaleFactor:ratio}),page=await context.newPage();
+ await page.goto('/?test=22&testRole=medic&testPreset=crew');await expect(page.locator('#world')).toHaveAttribute('data-ready','true',{timeout:20000});await expect(page.locator('#battle-person')).toBeVisible();
+ await expect.poll(async()=>{const d=await diagnostics(page);return Math.abs(d.camera.cssHeight-d.metrics.height);}).toBeLessThan(1);
+ await page.evaluate(()=>{window.__moveViewSamples=[];window.__moveViewTimer=setInterval(()=>{const c=document.querySelector('canvas'),d=c.getYardDiagnostics(),r=document.querySelector('#world').getBoundingClientRect(),a=document.querySelector('.yard-art').getBoundingClientRect();window.__moveViewSamples.push({time:performance.now(),world:[r.x,r.y,r.width,r.height],art:[a.x,a.y,a.width,a.height],scale:d.metrics.cssScale,effectiveZoom:d.camera.zoom*d.camera.cssWidth/d.camera.bufferWidth,quality:d.qualityRatio,camera:d.camera,armed:d.movement.armed,phase:window.__movePhase});},40);});
+ await page.evaluate(()=>window.__movePhase='before');await page.waitForTimeout(200);
+ await select(page,'hero');await page.evaluate(()=>window.__movePhase='selected');await page.waitForTimeout(300);
+ await clickArt(page,artPoint({x:330,y:400}));await expect.poll(async()=>(await snapshot(page)).people[0].task?.type).toBe('move');await page.evaluate(()=>window.__movePhase='queued');await page.waitForTimeout(300);
+ await page.screenshot({path:`.local/day22-queued-${width}.png`});await page.locator('[data-action=pause]').filter({visible:true}).first().click();
+ await page.waitForTimeout(5500);
+ const samples=await page.evaluate(()=>{clearInterval(window.__moveViewTimer);return window.__moveViewSamples;});writeFileSync(`.local/day22-scale-${width}.json`,JSON.stringify(samples,null,2));await testInfo.attach('camera-samples',{body:JSON.stringify(samples),contentType:'application/json'});
+ const first=samples[0];for(const s of samples){expect(s.world.map((v,i)=>Math.abs(v-first.world[i])).every(v=>v<1),JSON.stringify({first,s})).toBe(true);expect(s.effectiveZoom,JSON.stringify({first,s})).toBeCloseTo(first.effectiveZoom,3);}
+ await context.close();
+});
 
 for(const width of [320,390])test(`daytime ${width}: select a person, click ground and walk without spending or saving`,async({page})=>{
  await page.setViewportSize({width,height:width===320?568:844});const errors=[],posts=[];page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(r.method()==='POST')posts.push(r.url());});const base=await boot(page);
@@ -27,14 +69,16 @@ for(const width of [320,390])test(`daytime ${width}: select a person, click grou
 
 test('Retina touch: pick the actual person, queue movement while paused, arrive and temporarily hold offline',async({browser})=>{
  const context=await browser.newContext({viewport:{width:390,height:844},deviceScaleFactor:2,isMobile:true,hasTouch:true}),page=await context.newPage(),errors=[],posts=[];page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(r.method()==='POST')posts.push(r.url());});
- await boot(page,true);await page.locator('[data-action=more-night]').click();await page.locator('[data-group=orders][data-value=support]').click();await page.locator('[data-action=auto-pause]').click();await page.locator('[data-action=close-overlay]').click();
+ await boot(page,true);await page.locator('[data-action=more-night]').click();await page.locator('[data-action=command-settings]').click();await page.locator('[data-group=orders][data-value=support]').click();await page.locator('[data-action=auto-pause]').click();await page.locator('[data-action=close-overlay]').click();
  const before=await snapshot(page);await select(page,'lin',true);await expect(page.locator('#battle-person')).toHaveValue('lin');await context.setOffline(true);
  await clickArt(page,artPoint({x:350,y:400}),true);await expect.poll(async()=>(await snapshot(page)).people.find(p=>p.id==='lin').task?.type).toBe('move');
  const queued=await snapshot(page);expect(queued.elapsed).toBe(0);expect(queued.paused).toBe(true);expect(queued.people.find(p=>p.id==='hero').task).toBeNull();expect(queued.resources).toEqual(before.resources);await expect(page.locator('#map-help')).toContainText('继续后移动');await expect(page.locator('#battle-live')).toContainText('待出发');
  await expect.poll(async()=>(await diagnostics(page)).movement.target?.x).toBeCloseTo(350,2);await page.screenshot({path:'test-results/click-move-queued-retina.png',fullPage:true});
  await page.locator('[data-action=pause]').tap();await expect.poll(async()=>((await snapshot(page)).people.find(p=>p.id==='lin').task?.stage==='work'?(await snapshot(page)).people.find(p=>p.id==='lin').x:undefined),{timeout:10000}).toBeCloseTo(350,2);
  const arrived=(await snapshot(page)).people.find(p=>p.id==='lin');await page.waitForTimeout(500);const held=(await snapshot(page)).people.find(p=>p.id==='lin');expect(held.x).toBe(arrived.x);expect(held.y).toBe(arrived.y);
- await select(page,'hero',true);await clickArt(page,artPoint({x:335,y:205}),true);await expect.poll(async()=>((await snapshot(page)).people.find(p=>p.id==='hero').task?.stage==='work'?(await snapshot(page)).people.find(p=>p.id==='hero').y:undefined),{timeout:15000}).toBeCloseTo(205,2);
+ await select(page,'hero',true);await clickArt(page,artPoint({x:335,y:205}),true);await expect.poll(async()=>(await snapshot(page)).people.find(p=>p.id==='hero').task?.type).toBe('move');
+ const heroDestination=(await snapshot(page)).people.find(p=>p.id==='hero').task.target;expect(Math.hypot(heroDestination.x-335,heroDestination.y-205)).toBeLessThan(1);
+ await expect.poll(async()=>((await snapshot(page)).people.find(p=>p.id==='hero').task?.stage==='work'?(await snapshot(page)).people.find(p=>p.id==='hero').y:undefined),{timeout:15000}).toBeCloseTo(heroDestination.y,2);
  await page.locator('[data-action=pause]').tap();await expect(page.locator('[data-action=pause]')).toHaveText('继续');await page.waitForTimeout(200);const frozen=(await diagnostics(page)).tokens;await page.waitForTimeout(250);expect((await diagnostics(page)).tokens).toEqual(frozen);expect(posts).toEqual([]);await inOneScreen(page);await page.screenshot({path:'test-results/click-move-night-retina.png',fullPage:true});expect(errors).toEqual([]);await context.close();
 });
 
@@ -83,7 +127,10 @@ for(const width of [320,390])test(`safe standing ${width}: house-front taps stay
  await expect.poll(async()=>(await diagnostics(page)).tokens.find(t=>t.id==='p-hero').moving).toBe(false);
  const gate=await diagnostics(page),person=gate.tokens.find(t=>t.id==='p-hero');expect(person.y).toBeLessThanOrEqual(443.01);expect(person.y).toBeLessThan(gate.components.find(c=>c.id==='gate').depth);
  await page.screenshot({path:`.local/validation/safe-standing/gate-inside-${width}.png`,fullPage:true});
- Object.assign(s,applyCampaignAction(s,{type:'prepare'}));for(const p of s.people)p.nightRole='sleep';
+ let save=await readSave(page);
+ for(const action of [...s.people.map(p=>({type:'nightRole',person:p.id,role:'sleep'})),{type:'prepare'}]){
+  const result=await browserSave(page,'action',{runId:save.runId,revision:save.revision,requestId:randomUUID(),action});expect(result.ok).toBe(true);save=result.value;
+ }
  await page.reload();await expect(page.locator('#world')).toHaveAttribute('data-ready','true');
  await expect.poll(async()=>(await diagnostics(page)).tokens.filter(t=>t.id.startsWith('p-')).length).toBe(0);
  expect((await diagnostics(page)).shelter.people).toEqual(['hero','lin']);

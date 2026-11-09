@@ -1,4 +1,4 @@
-import {NIGHT_ROLES,ZONES} from '../src/content.js';
+import {NIGHT_ROLES,ZONES,ENEMIES} from '../src/content.js';
 import {NIGHT_ACTIONS} from '../src/balance.js';
 import {orderDuration} from '../src/night-orders.js';
 import {isIndoors,sleepInterrupted} from '../src/shelter.js';
@@ -6,7 +6,7 @@ import {fearStatus} from '../src/fear.js';
 import {earlyWarningTarget} from '../src/cooperation.js';
 
 const zoneName=id=>ZONES.find(z=>z.id===id)?.name||'防区';
-const taskNames={move:'移动定位',guard:'驱赶',repair:'修补',fire:'重燃',stoke:'拨火',addWood:'添柴',extinguish:'灭火',brace:'顶住',throw:'投掷打断',bait:'放置诱饵',compact:'压实土道',clearWet:'清理湿污',retreat:'回屋休整',aid:'紧急自救',barricade:'加固小屋'};
+const taskNames={heavy:'蓄力重击',move:'移动定位',guard:'驱赶',repair:'修补',fire:'重燃',stoke:'拨火',addWood:'添柴',extinguish:'灭火',brace:'顶住',throw:'投掷打断',bait:'放置诱饵',compact:'压实土道',clearWet:'清理湿污',retreat:'回屋休整',aid:'紧急自救',barricade:'加固小屋'};
 
 export function assignmentText(p){return p.nightRole==='sleep'?'睡眠 · 小屋':`${NIGHT_ROLES[p.nightRole]} · ${zoneName(p.zone)}`;}
 export function resumeText(p){return p.nightRole==='sleep'?'回小屋睡眠':p.nightRole==='support'?`恢复自动支援 · 重点${zoneName(p.zone)}`:`返回${zoneName(p.zone)}巡守`;}
@@ -19,6 +19,11 @@ function baseOrderStatus(p,b){
  if(!t)return {role,current:p.nightRole==='sleep'?(interrupted?`${isIndoors(b,p)?'屋内休息':'正在回屋休息'} · 睡眠已中断`:isIndoors(b,p)?'屋内睡眠':'正在回屋睡眠'):p.nightRole==='support'?'按分工自动支援 / 待命':`按分工巡守${zoneName(p.zone)}`,after:resume,activity:p.nightRole==='sleep'?(interrupted?'睡眠已中断':isIndoors(b,p)?'屋内睡眠':'回屋途中'):p.nightRole==='support'?'自动支援':'巡守'};
  const source=t.assist?'自动支援':t.automatic?'自动':'临时',name=taskNames[t.type]||'任务';
  const target=['retreat','aid','barricade'].includes(t.type)?'小屋':t.type==='move'?'目的地':['fire','stoke','addWood','extinguish','clearWet'].includes(t.type)?'中央篝火':zoneName(t.target);
+ if(t.type==='heavy'){
+  const enemy=b.enemies.find(e=>e.id===t.enemyId),name=ENEMIES[enemy?.type]?.name||'目标',seconds=Math.max(0,orderDuration(p,'heavy',b.aidKit)-(t.progress||0)).toFixed(1);
+  const current=t.stage==='work'?`正在蓄力重击${name} · 剩余${seconds}秒`:`靠近${name}（${target}），到达后蓄力重击`;
+  return {role,current:`${current}${b.paused?'（已暂停，继续后执行）':''}`,after:resume,activity:t.stage==='work'?'蓄力重击':b.paused?'待靠近目标':'靠近重击目标'};
+ }
  let activity=b.paused?'待出发':t.assist?'前往支援':'赶路中',current=`${source}${name} · ${b.paused?'待执行，继续后前往':'赶往'}${target}`;
  if(t.stage!=='work'&&(t.type==='move'||t.type==='retreat'))current+=`，到达后${t.type==='move'?'警戒':'休整'}${NIGHT_ACTIONS.hold}秒`;
  if(t.stage==='work'){

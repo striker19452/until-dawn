@@ -16,15 +16,15 @@ for(const [width,day] of [[320,1],[390,7]])test(`real offline worker respects sh
  await expect.poll(()=>page.evaluate(day=>day===1?window.__strikeSamples.some(s=>!s.boss&&s.stun>0):window.__strikeSamples.some(s=>s.boss&&s.phase==='charge'&&s.age<=.11),day),{timeout:40000,intervals:[100]}).toBe(true);
  await page.evaluate(()=>window.__strikeWorker.postMessage({type:'command',action:{type:'pause'}}));await expect.poll(()=>page.locator('#world').evaluate(el=>el.getNightSnapshot().paused)).toBe(true);
  const samples=await page.evaluate(()=>window.__strikeSamples);expect(samples.length).toBeGreaterThan(0);expect(samples.every(s=>s.distance<=50)).toBe(true);
- const ordinary=samples.filter(s=>!s.boss&&s.stun!==undefined);expect(ordinary.every(s=>s.stun<=.15)).toBe(true);if(day===1)expect(ordinary.some(s=>s.stun>0)).toBe(true);
+ const ordinary=samples.filter(s=>!s.boss&&s.stun!==undefined);expect(ordinary.every(s=>s.stun<=.5)).toBe(true);if(day===1)expect(ordinary.some(s=>s.stun>0)).toBe(true);
  if(day===7){const bossHits=samples.filter(s=>s.boss&&s.phase==='charge'&&s.age<=.11);expect(bossHits.length).toBeGreaterThan(0);expect(bossHits.every(s=>s.stun===0)).toBe(true);}
  await page.getByRole('button',{name:'打开游戏菜单'}).click();await page.locator('[data-action=drawer][data-panel=members]').click();await page.getByRole('button',{name:'技能',exact:true}).click();await page.locator('[data-group=skill][data-value=guard]').click();
- await expect(page.getByTestId('skill-guide')).toContainText('攻击距离50');await expect(page.getByTestId('skill-guide')).toContainText('0.15秒');await expect(page.getByTestId('skill-guide')).toContainText('首领及双脉分裂体免疫');
+ await expect(page.getByTestId('skill-guide')).toContainText('攻击距离50');await expect(page.getByTestId('skill-guide')).toContainText('0.5秒');await expect(page.getByTestId('skill-guide')).toContainText('首领及双脉分裂体免疫');
  const layout=await page.locator('#sheet-body').evaluate(el=>({scroll:el.scrollWidth,client:el.clientWidth,page:document.documentElement.scrollWidth,width:innerWidth}));expect(layout.scroll).toBeLessThanOrEqual(layout.client);expect(layout.page).toBeLessThanOrEqual(layout.width);
  await page.screenshot({path:`.local/attack-tuning/guard-${width}.png`,fullPage:true});expect(errors).toEqual([]);expect(requests).toEqual([]);
 });
 
 test('desktop boss help explains ordinary-attack immunity while preserving specific counters',async({page})=>{
  await page.setViewportSize({width:1280,height:900});await page.goto('/?test=28');await expect(page.locator('#phase')).toHaveText('测试 · 实时守夜');
- await page.getByRole('button',{name:'打开游戏菜单'}).click();await page.getByRole('button',{name:'本夜情报',exact:true}).click();await expect(page.getByTestId('boss-preview')).toContainText('首领及双脉分裂体免疫普通攻击眩晕');await expect(page.getByTestId('boss-preview')).toContainText('投掷、陷阱与机制控制仍有效');
+ await page.getByRole('button',{name:'打开游戏菜单'}).click();await page.getByRole('button',{name:'本夜情报',exact:true}).click();await expect(page.getByTestId('boss-preview')).toContainText('首领及双脉分裂体免疫普通攻击眩晕');await expect(page.getByTestId('boss-preview')).toContainText('重击、陷阱与机制控制仍有效');
 });

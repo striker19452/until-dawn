@@ -11,12 +11,16 @@ export function bossRenderPoint(e,toArt,sheet){
 }
 
 const clamp=n=>Math.max(0,Math.min(1,n)),smooth=n=>{const v=clamp(n);return v*v*(3-2*v);};
-export function bossPose(b,e,t,reduced=false,moving=false){
+export function bossPose(b,e,t,reduced=false,moving=false,distance=null){
+ t=b.paused?b.elapsed:t;
  const bs=b.boss,phase=e.bossBrood?'brood':bs?.phase,active=e.mode==='attack'||e.mode==='inside';
- const wave=Math.sin(t*(e.type==='cinderwhale'?2.7:4.2)),stride=Math.sin(t*(e.bossForm?10:7));
+ const wave=Math.sin(t*(e.type==='cinderwhale'?2.7:4.2)),stride=Math.sin(distance===null?t*(e.bossForm?10:7):distance/(e.bossForm?14:28)*Math.PI*2);
  const pose={angle:0,dx:0,dy:0,sx:1,sy:1,alpha:1,roll:0,phase,facing:e.zone==='left'?1:e.zone==='right'?-1:null};
  if(!reduced){pose.sx+=wave*.018;pose.sy-=wave*.022;
-  if(moving){pose.angle=stride*2.8;pose.dy=-Math.abs(stride)*(e.bossForm?4:2.5);pose.sx+=stride*.012;}
+  if(moving){
+   const gait={bastion:{angle:1.8,lift:2,sway:.016},broodmother:{angle:1.2,lift:1.1,sway:.025},cinderwhale:{angle:1,lift:.8,sway:.035},twinvein:{angle:2.8,lift:e.bossForm?3.5:2,sway:.018}}[e.type]||{angle:2.8,lift:2.5,sway:.012};
+   pose.angle=stride*gait.angle;pose.dy=-Math.abs(stride)*gait.lift;pose.sx+=stride*gait.sway;
+  }
  }
  if(e.bossDormant){Object.assign(pose,{angle:-78,sy:.72,alpha:.48,phase:'dormant'});return pose;}
  if(!active)return pose;
@@ -44,7 +48,7 @@ export function bossPose(b,e,t,reduced=false,moving=false){
 
 export function animateBoss(obj,b,e,t,reduced){
  const sprite=obj.sprite,width=sprite.displayWidth,height=sprite.displayHeight;
- const pose=bossPose(b,e,t,reduced,obj.moving);
+ const pose=bossPose(b,e,t,reduced,obj.moving,obj.distance??null);
  pose.facing=obj.actionFacing??(e.mode==='inside'||e.mode==='approach'||e.bossDormant?obj.facing:pose.facing??obj.facing);
  if(pose.facing!==undefined)sprite.setFlipX(facingFlip(obj.baseFacing??-1,pose.facing));
  // Rotate around the body's centre, so rolling never swings the whole sprite

@@ -18,10 +18,41 @@ function fixture(types=['garden','water','workshop','generator','infirmary','wat
 function enemy(id='intruder',extra={}){return {id,type:'walker',zone:'gate',x:240,y:468,hp:ENEMIES.walker.hp,max:ENEMIES.walker.hp,mode:'inside',stun:0,attack:0,progress:0,...extra};}
 const advance=(b,n)=>{for(let i=0;i<n;i++)stepBattle(b,.05);};
 
-test('each building starts with 10 durability; legacy saves normalize without reviving ruins',()=>{
+test('regular buildings start with 10 durability; legacy saves normalize without reviving ruins',()=>{
  const s=applyCampaignAction(initialCampaign(1),{type:'chooseRole',role:'repairman'}),built=applyCampaignAction(s,{type:'build',building:'garden'});assert.equal(built.buildings[0].hp,10);
  delete built.buildings[0].hp;const before=structuredClone(built);const normalized=normalizeCampaign(structuredClone(built));assert.equal(normalized.buildings[0].hp,10);assert.deepEqual(built,before);
  normalized.buildings[0].hp=0;normalizeCampaign(normalized);assert.equal(normalized.buildings[0].hp,0);
+});
+
+test('watchtowers build, repair and rebuild to 50 and migrate legacy durability only once',()=>{
+ const {s}=fixture(['watchtower']);
+ const legacy=s.buildings[0];legacy.hp=6;
+ const migrated=normalizeCampaign(structuredClone(s));assert.equal(migrated.buildings[0].hp,30);
+ const repaired=applyCampaignAction(migrated,{type:'repairBuilding',id:legacy.id});assert.equal(repaired.buildings[0].hp,50);
+ const ready=applyCampaignAction(repaired,{type:'prepare'}),battle=createBattle(ready,'tower-health');
+ battle.buildings[0].hp=7;
+ const result=settleNight(ready,battle);validateClientResult(ready,result);
+ assert.equal(normalizeCampaign(result).buildings[0].hp,7);
+ assert.ok(result.report.events.some(line=>line.includes('7/50')));
+ const oldResult=structuredClone(result);delete oldResult.buildings[0].maxHp;oldResult.buildings[0].hp=7;
+ assert.equal(validateClientResult(ready,oldResult).buildings[0].hp,35);
+ const invalid=structuredClone(result);invalid.buildings[0].hp=51;
+ assert.throws(()=>validateClientResult(ready,invalid),/设施耐久无效/);
+ legacy.hp=0;assert.equal(normalizeCampaign(structuredClone(s)).buildings[0].hp,0);
+ const rebuilt=applyCampaignAction(s,{type:'rebuildBuilding',id:legacy.id,building:'watchtower'});assert.equal(rebuilt.buildings[0].hp,50);
+ s.buildings=[];
+ const built=applyCampaignAction(s,{type:'build',building:'watchtower'});assert.equal(built.buildings[0].hp,50);
+});
+
+test('intruders prefer an operational upgraded watchtower when choosing a structure',()=>{
+ for(const branch of ['yield','steady']){
+  const {b}=fixture(['garden','watchtower']),tower=b.buildings[1],e=enemy();
+  Object.assign(tower,{level:2,branch});b.enemies=[e];b.rng=1;
+  stepBattle(b);assert.equal(e.targetId,tower.id);assert.equal(b.house,100);
+  Object.assign(e,e.targetPoint);tower.hp=.01;
+  stepBattle(b);assert.equal(tower.hp,0);
+  stepBattle(b);assert.notEqual(e.targetId,tower.id);
+ }
 });
 
 test('seeded intruders choose both house and facilities, commit while walking, pause freezes targets and damage',()=>{
@@ -40,7 +71,7 @@ test('every plot is reachable, damage stacks at 1.8/sec, zero creates a ruin and
   const {b}=fixture(),e=enemy('one',{targetId:'b'+i,targetName:BUILDINGS[b.buildings[i].type].name,targetPoint:PLOTS[i]});b.enemies=[e];
   // An actual first selection computes the reachable edge, rather than walking through buildings.
   delete e.targetId;for(let seed=1;seed<100;seed++){b.rng=seed*1000000;stepBattle(b);if(e.targetId==='b'+i)break;delete e.targetId;}
-  assert.equal(e.targetId,'b'+i);const house=b.house;let ticks=0;while(b.buildings[i].hp===10&&ticks++<2000)stepBattle(b);
+  assert.equal(e.targetId,'b'+i);const house=b.house,startingHp=b.buildings[i].hp;let ticks=0;while(b.buildings[i].hp===startingHp&&ticks++<2000)stepBattle(b);
   assert.ok(ticks<2000,`plot ${i} must be reachable`);assert.equal(b.house,house);
   const before=b.buildings[i].hp;advance(b,20);assert.ok(Math.abs(b.buildings[i].hp-(before-1.8))<1e-7);
   b.buildings[i].hp=.01;stepBattle(b);assert.equal(b.buildings[i].hp,0);assert.ok(b.events.some(v=>v.type==='destroyed'&&v.targetId==='b'+i));stepBattle(b);assert.notEqual(e.targetId,'b'+i);assert.equal(b.buildings[i].hp,0);

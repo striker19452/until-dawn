@@ -7,7 +7,7 @@ import {DOG_RULES} from './dog.js';
 // Shared by the simulation and the UI so previews use the actual rules.
 export const STRIKE_RANGE=50;
 export const ENEMY_MELEE_RANGE=50;
-export const STRIKE_STUN=.15;
+export const STRIKE_STUN=.5;
 export function canEnemyHitPerson(b,enemy,person){
  return enemy.hp>0&&enemy.mode==='inside'&&!(enemy.stun>0)&&!enemy.bossDormant&&!person.dead&&!isIndoors(b,person)&&Math.hypot(enemy.x-person.x,enemy.y-person.y)<=ENEMY_MELEE_RANGE;
 }

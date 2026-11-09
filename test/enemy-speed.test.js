@@ -10,7 +10,7 @@ function fixture(day=1){let s=act(initialCampaign(53),{type:'chooseRole',role:'r
 function enemy(type,extra={}){return {id:'speed',type,zone:'right',x:545,y:310,hp:ENEMIES[type].hp,max:ENEMIES[type].hp,mode:'approach',attack:0,progress:0,stun:0,called:false,...extra};}
 
 test('nimble ground species double their movement speed and bulky species keep their pacing',()=>{
- assert.deepEqual(Object.entries(ENEMIES).filter(([,d])=>d.agile).map(([id])=>id),['climber','burrower','skitter']);
+ assert.deepEqual(Object.entries(ENEMIES).filter(([,d])=>d.agile).map(([id])=>id),['climber','burrower','skitter','bladebeast','echomantis']);
  for(const [type,speed] of Object.entries({walker:18,climber:44,rammer:12,caller:16,burrower:34,quencher:15,skitter:66,bastion:15,broodmother:15,cinderwhale:14,twinvein:16})){
   const b=fixture(),e=enemy(type);b.enemies=[e];stepBattle(b,.1);close(545-e.x,speed*.1);close(e.y,310);
  }
