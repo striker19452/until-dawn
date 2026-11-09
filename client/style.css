@@ -95,17 +95,9 @@
 .boss-summary{position:relative;display:block;width:calc(100% - 16px);margin:3px 8px 0;padding:5px 8px 7px;border:1px solid #ae9270;border-radius:5px;background:#3b3637;color:#f2dfb7;text-align:left;overflow:hidden;min-width:0}.boss-summary>span{display:flex;justify-content:space-between;gap:8px;min-width:0}.boss-summary b{font-size:12px;font-weight:600}.boss-summary em{font-size:11px;font-style:normal;font-variant-numeric:tabular-nums}.boss-summary strong{font-size:10px;font-weight:500;color:#ebc691;white-space:nowrap}.boss-summary small{font-size:10px;overflow-wrap:anywhere;text-align:right;line-height:1.5}.boss-summary i{position:absolute;height:3px;left:0;bottom:0;background:#be9271}.boss-preview-heading{display:grid;grid-template-columns:110px minmax(0,1fr);gap:8px;align-items:center}.boss-preview-heading .boss-art{height:90px}.boss-preview-heading h3{font-size:18px}.boss-preview .copy{font-size:12px;line-height:1.8}.boss-preview .mini{font-size:10px;line-height:1.7}.boss-art{overflow:hidden}@media(max-height:700px){.boss-summary{padding:3px 6px 6px;margin-top:2px}.boss-summary b{font-size:11px}.boss-summary small{font-size:9px}.boss-preview-heading{grid-template-columns:90px minmax(0,1fr)}}
 
 @media(max-height:700px) and (max-width:959px){
- .shell.boss-night #nightbar{display:grid;grid-template-columns:minmax(0,1fr) 115px;align-items:stretch;gap:5px;margin:3px 7px 0}
- .shell.boss-night #boss-live{grid-column:1;grid-row:1;min-width:0}
- .shell.boss-night .boss-summary{width:100%;height:100%;margin:0;padding:4px 6px 7px}
- .shell.boss-night .nightbar{grid-column:2;grid-row:1;padding:0;gap:4px;min-height:37px}
- .shell.boss-night .nightbar>small,.shell.boss-night .nightbar>.progress{display:none}
- .shell.boss-night .nightbar .button{flex:1;padding:5px 4px;min-width:0;min-height:37px}
  .shell.boss-night #panel [data-order-row=role],.shell.boss-night #panel [data-order-row=after]{display:none}
  .shell.boss-night #caption strong,.shell.boss-night #caption #map-help{display:none}
  .shell.boss-night #notice .notice{max-height:44px;overflow-y:auto}
- .shell.boss-night .world-wrap{min-height:155px}
- .shell.boss-night .panel{margin-bottom:3px}
 }
 
 .building-state-preview{display:block;width:100%;height:140px;margin:0 auto 10px;border-radius:8px;background:radial-gradient(ellipse at 50% 70%,#917b5030,transparent 70%);overflow:hidden}.card label:has([data-rebuild-id]){display:block;margin:12px 0 8px}.card [data-rebuild-id]{display:block;width:100%;min-height:42px;margin-top:5px}

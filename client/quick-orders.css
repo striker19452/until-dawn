@@ -32,19 +32,14 @@
  .shell.night .quick-context{grid-template-columns:repeat(3,minmax(0,1fr));margin:0}
  .shell.night .quick-extra{margin:0;max-height:170px;overflow-y:auto;overscroll-behavior:contain}
  .shell.night .battle-orders .button{font-size:11px}
- .shell.night .battle-orders small{display:block;line-height:1.4}
+ .shell.night .battle-orders small{line-height:1.15;margin-top:2px}
 }
 .quick-current{grid-column:1/-1;margin:4px 0 0;font-size:11px;line-height:1.5;color:var(--ink);overflow-wrap:anywhere}
 .night .quick-current{color:#e6d0a4}
 @media(max-width:959px) and (max-height:700px){
- .shell.night.quick-open .objective-notice ul,.shell.night.quick-open .objective-notice span,.shell.night.quick-open .objective-notice small{display:none}
- .shell.night.quick-open .objective-notice b{margin:0}
  .shell.night.quick-open .quick-extra{max-height:146px}
 }
-@media(min-width:600px) and (max-width:959px) and (max-height:500px){
- .shell.night .objective-notice ul,.shell.night .objective-notice span,.shell.night .objective-notice small{display:none}
- .shell.night .objective-notice b{margin:0}
- .shell.night #panel{max-height:180px;overflow-y:auto;min-height:0}
+@media(max-width:959px) and (max-height:500px) and (orientation:landscape){
  .shell.night .quick-extra{max-height:100px}
 }
 .night .battle-selects button,.night .battle-foot>.button{min-height:44px}

@@ -17,7 +17,8 @@ for(const viewport of [{width:320,height:568},{width:390,height:844},{width:960,
  const expanded=await bounds(page);
  if(viewport.width<960){
   await expect(page.locator('#view-toggle')).toBeHidden();
-  expect(expanded.world.height).toBeGreaterThan(viewport.height*.67);
+  expect(expanded.world.width).toBe(viewport.width);
+  expect(expanded.art.width).toBeGreaterThan(viewport.width*.83);
   await expect(page.getByRole('button',{name:'打开游戏菜单'})).toBeVisible();
  }else{
   const panel=await page.locator('#panel').boundingBox();expect(panel.x).toBeGreaterThanOrEqual(expanded.world.right);expect(expanded.world.height).toBeGreaterThan(viewport.height-20);expect(expanded.world.width).toBeGreaterThan(viewport.width-330);

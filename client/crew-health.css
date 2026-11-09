@@ -74,9 +74,9 @@
  .crew-stamina-track{width:12px}
 }
 @media(max-width:959px){
- .shell,.shell.wide-view{grid-template-rows:44px 32px auto auto minmax(0,1fr) auto auto auto auto;grid-template-areas:"status" "stock" "boss" "notice" "scene" "crew" "controls" "advance" "nav"}
- .shell>.crew-hud{grid-area:crew;margin:0;gap:3px;padding:4px 6px;border-top:1px solid var(--line)}
+ .shell>.crew-hud{grid-area:crew;margin:0;gap:3px;padding:2px 6px;border-top:1px solid var(--line)}
  .crew-person{padding:4px 5px;min-height:44px}
+ .crew-person .crew-health-track{margin:2px 0}
  .shell.night .world-caption{padding-right:103px;min-height:34px}
  .shell.night #caption .combat-message{line-height:24px}
 }
@@ -87,8 +87,7 @@
  .crew-person-detail{font-size:9px;gap:2px}
  .crew-stamina-track{width:13px}
 }
-@media(min-width:600px) and (max-width:959px) and (max-height:500px){
- .shell,.shell.wide-view{grid-template-columns:minmax(0,1fr) 272px;grid-template-areas:"scene status" "scene stock" "scene boss" "scene notice" "scene ." "scene crew" "scene controls" "scene advance" "scene nav"}
+@media(max-width:959px) and (max-height:500px) and (orientation:landscape){
  .crew-person{padding:4px 3px}
  .crew-person-heading b,.crew-person-heading strong{font-size:10px}
  .crew-person-detail{gap:2px}

@@ -69,7 +69,36 @@ try{
  assert.deepEqual(errors,[],'Browser must have no uncaught errors');
  await mkdir('test-results',{recursive:true});
  await page.screenshot({path:'test-results/pages-smoke.png'});
- console.log(`Pages smoke test passed: ${url}\nOnboarding, persistent saves, subpath assets, offline worker night, refresh recovery and night 7 verified.`);
+ await context.close();
+
+ const phone=await browser.newContext({viewport:{width:320,height:568},deviceScaleFactor:2,isMobile:true,hasTouch:true,reducedMotion:'reduce'});
+ const mobile=await phone.newPage();
+ await mobile.goto(`${url}?test=14`);
+ await expect(mobile.getByTestId('boss-status')).toBeVisible({timeout:30000});
+ const map=mobile.locator('#world');
+ const yardWidth=()=>map.locator('.yard-art').first().evaluate(art=>art.getBoundingClientRect().width);
+ await expect.poll(yardWidth).toBeGreaterThan(220);
+ const dock=await mobile.locator('#panel').boundingBox();
+ for(const control of await mobile.locator('#panel :is(.battle-orders button,[data-action=more-night])').all()){
+  const box=await control.boundingBox();
+  assert.ok(box.y+box.height<=dock.y+dock.height+1,'Primary night commands must fit on a short phone');
+ }
+ await mobile.getByRole('button',{name:'查看本夜通关条件'}).tap();
+ await expect(mobile.locator('#sheet-body').getByTestId('challenge-conditions')).toBeVisible();
+ await mobile.getByRole('button',{name:'关闭面板'}).tap();
+ await mobile.getByRole('button',{name:'打开游戏菜单'}).tap();
+ await mobile.getByRole('button',{name:'返回白天准备'}).tap();
+ await mobile.getByRole('button',{name:'关闭面板'}).tap();
+ await mobile.locator('[data-action=prepare]').tap();
+ await expect(mobile.locator('[data-action=start-night]')).toBeVisible();
+ await expect.poll(yardWidth).toBeGreaterThan(270);
+ assert.equal((await map.boundingBox()).width,320);
+ await mobile.setViewportSize({width:568,height:320});
+ await expect.poll(async()=>(await map.boundingBox()).height).toBe(320);
+ const scene=await map.boundingBox(),advance=await mobile.locator('[data-action=start-night]').boundingBox();
+ assert.ok(advance.x>=scene.x+scene.width&&advance.y+advance.height<=320,'Landscape controls must fit next to the courtyard');
+ await phone.close();
+ console.log(`Pages smoke test passed: ${url}\nOnboarding, saves, subpath assets, offline night, refresh recovery and phone layout verified.`);
 }finally{
  await browser?.close();
  if(server)await new Promise(resolve=>server.close(resolve));
